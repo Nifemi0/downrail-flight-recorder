@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-10-23T10:47:00.600Z",
+  "chainId": 50383,
+  "indexerUrl": "https://hideki-dev.smk.somnia.host/v1/graphql",
+  "marketCount": 21,
+  "supported": [
+    {
+      "symbol": "ETH-PERP",
+      "poolAddress": "0xd6cb1dd58580b84d76068ac21594219ce03aeddf",
+      "marginBank": "0x478769e1177c0773c43a593dccc4ad15f15f1394",
+      "stopRegistry": "0x44bfa5b28684e8d2156d15b85902da18f02b3a34",
+      "quoteToken": "0xed7993a74dae1e6656b704a424dcd8711aaf4f72",
+      "baseDecimals": 18,
+      "quoteDecimals": 18,
+      "tickSize": "10000000000000000",
+      "lotSize": "100000000000000",
+      "minQuantity": "4000000000000000"
+    },
+    {
+      "symbol": "BTC-PERP",
+      "poolAddress": "0x4181dd08e73bbcdd1ba3e615a18f6abd941b94c0",
+      "marginBank": "0x478769e1177c0773c43a593dccc4ad15f15f1394",
+      "stopRegistry": "0x52e2ccebaec9332672c247e9a90aa3d61fb615ef",
+      "quoteToken": "0xed7993a74dae1e6656b704a424dcd8711aaf4f72",
+      "baseDecimals": 8,
+      "quoteDecimals": 18,
+      "tickSize": "100000000000000000",
+      "lotSize": "1000",
+      "minQuantity": "13000"
+    }
+  ]
+}
+

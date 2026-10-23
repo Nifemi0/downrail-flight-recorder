@@ -1,0 +1,35 @@
+{
+  "name": "downrail-flight-recorder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A verifiable flight recorder for dreamDEX Perps positions.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "spike:markets": "tsx scripts/read-markets.ts"
+  },
+  "dependencies": {
+    "@somnia-chain/markets-sdk": "0.32.1",
+    "@somnia-chain/reactivity": "0.2.1",
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "viem": "2.57.10"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}
+

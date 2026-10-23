@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-10-23T10:53:17.038Z",
+  "chainId": 50383,
+  "account": "0x78787630e6F6B978390A76d809804b42DF0bd284",
+  "positions": [],
+  "fills": [],
+  "positionChanges": [],
+  "funding": [],
+  "sourceStatus": {
+    "positions": {
+      "state": "verified",
+      "detail": "0 supported market rows returned."
+    },
+    "fills": {
+      "state": "verified",
+      "detail": "0 supported perp fills returned."
+    },
+    "positionChanges": {
+      "state": "verified",
+      "detail": "0 lifecycle rows returned."
+    },
+    "funding": {
+      "state": "verified",
+      "detail": "0 funding rows returned."
+    }
+  }
+}
