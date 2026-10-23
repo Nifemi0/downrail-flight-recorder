@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { formatUnits } from "viem";
 
 import type { AccountRecorderSnapshot } from "@/lib/dreamdex/account";
 import type { MarketSnapshot } from "@/lib/dreamdex/markets";
@@ -9,6 +10,22 @@ import { formatCheckedAt, shortenAddress } from "@/lib/format";
 type Props = {
   initialSnapshot: MarketSnapshot;
 };
+
+function ArrowIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+      <path d="M6 18 18 6M8 6h10v10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function compactUnits(value: string | null, decimals: number) {
+  if (value === null) return "Not indexed";
+  const formatted = formatUnits(BigInt(value), decimals);
+  const [whole, fraction = ""] = formatted.split(".");
+  const trimmed = fraction.replace(/0+$/, "").slice(0, 6);
+  return trimmed ? `${whole}.${trimmed}` : whole;
+}
 
 export function MarketConsole({ initialSnapshot }: Props) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
@@ -26,6 +43,10 @@ export function MarketConsole({ initialSnapshot }: Props) {
       snapshot.supported[0],
     [selectedSymbol, snapshot.supported],
   );
+  const selectedMinimum = `${compactUnits(selected.minQuantity, selected.baseDecimals)} ${selected.baseSymbol}`;
+  const selectedLastPrice = selected.lastPrice
+    ? `${compactUnits(selected.lastPrice, selected.quoteDecimals)} ${selected.quoteSymbol}`
+    : "Awaiting first fill";
 
   async function refreshSnapshot() {
     setIsRefreshing(true);
@@ -81,9 +102,9 @@ export function MarketConsole({ initialSnapshot }: Props) {
           <span>DOWNRAIL</span>
         </a>
         <nav aria-label="Primary navigation">
+          <a href="#mechanics">How it works</a>
           <a href="#recorder">Recorder</a>
           <a href="#proof">Proof</a>
-          <a href="#mechanics">How it works</a>
         </nav>
         <div className="network-pill">
           <span className="status-dot" />
@@ -93,19 +114,27 @@ export function MarketConsole({ initialSnapshot }: Props) {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">Explainable perps infrastructure</p>
-          <h1>Every leveraged trade should explain itself.</h1>
+          <p className="eyebrow">The black box for dreamDEX Perps</p>
+          <h1>
+            <span>Every trade</span>
+            <span>leaves a trail.</span>
+          </h1>
           <p className="hero-description">
-            Downrail records a dreamDEX position from order to outcome, then turns
-            the chain evidence into a receipt a trader can actually understand.
+            Downrail records a position from intent to outcome, then turns the raw
+            chain events into one receipt a trader can read, verify, and share.
           </p>
           <div className="hero-actions">
             <a className="primary-action" href="#recorder">
-              Open the recorder <span aria-hidden="true">↗</span>
+              Open the recorder <span><ArrowIcon /></span>
             </a>
             <a className="text-action" href="#mechanics">
-              See what gets captured <span aria-hidden="true">→</span>
+              See the evidence flow <span aria-hidden="true">→</span>
             </a>
+          </div>
+          <div className="hero-facts" aria-label="Current product status">
+            <div><strong>{snapshot.marketCount}</strong><span>live perp markets</span></div>
+            <div><strong>{snapshot.chainId}</strong><span>Somnia chain</span></div>
+            <div><strong>Read only</strong><span>until you sign</span></div>
           </div>
         </div>
 
@@ -113,45 +142,62 @@ export function MarketConsole({ initialSnapshot }: Props) {
           <div className="signal-grid" aria-hidden="true" />
           <div className="orbit orbit-one" aria-hidden="true" />
           <div className="orbit orbit-two" aria-hidden="true" />
+          <div className="evidence-node node-order"><span />Order intent</div>
+          <div className="evidence-node node-fill"><span />Ordered fills</div>
+          <div className="evidence-node node-funding"><span />Funding</div>
           <div className="receipt-card">
             <div className="receipt-card-top">
-              <span>POSITION RECEIPT</span>
-              <span className="verified-label">CHAIN VERIFIED</span>
+              <span>RECEIPT ANATOMY</span>
+              <span className="verified-label">ILLUSTRATIVE</span>
             </div>
-            <strong>Why did this trade move?</strong>
+            <strong>One position. One provable story.</strong>
             <div className="receipt-line">
-              <span>Entry and fills</span>
-              <span>Waiting</span>
-            </div>
-            <div className="receipt-line">
-              <span>Funding impact</span>
-              <span>Waiting</span>
+              <span>Order intent</span>
+              <span>TX + PARAMETERS</span>
             </div>
             <div className="receipt-line">
-              <span>Realized PnL</span>
-              <span>Waiting</span>
+              <span>Execution</span>
+              <span>ORDERED FILLS</span>
             </div>
-            <div className="receipt-proof">Each line links back to source evidence.</div>
+            <div className="receipt-line">
+              <span>Outcome</span>
+              <span>PNL + FUNDING</span>
+            </div>
+            <div className="receipt-proof"><span className="proof-check" />Every line keeps its source.</div>
           </div>
         </div>
       </section>
+
+      <div className="connection-band" aria-label="Live connection status">
+        <span><i className="status-dot" />Live SDK connection</span>
+        <span>BTC-PERP + ETH-PERP</span>
+        <span>Indexer-backed evidence</span>
+        <span>No custody. No hidden signing.</span>
+      </div>
 
       <section className="recorder-section" id="recorder">
         <div className="section-heading">
           <div>
             <p className="eyebrow">Live testnet workspace</p>
-            <h2>Choose a market. Record the whole story.</h2>
+            <h2>Record first.<br />Explain everything.</h2>
+            <p className="section-intro">Start with a live market or inspect a wallet that has already traded. Downrail keeps the evidence together from the first event.</p>
           </div>
-          <button className="refresh-button" onClick={refreshSnapshot} disabled={isRefreshing}>
-            {isRefreshing ? "Refreshing…" : "Refresh live data"}
-          </button>
+          <div className="refresh-stack">
+            <span>Last verified {formatCheckedAt(snapshot.checkedAt)}</span>
+            <button className="refresh-button" onClick={refreshSnapshot} disabled={isRefreshing}>
+              {isRefreshing ? "Refreshing…" : "Refresh live data"}
+            </button>
+          </div>
         </div>
 
         {refreshError ? <p className="error-banner">{refreshError}</p> : null}
 
         <div className="workspace">
           <aside className="market-rail" aria-label="Supported markets">
-            <p className="panel-label">Verified markets</p>
+            <div className="rail-heading">
+              <p className="panel-label">Choose instrument</p>
+              <span>Live</span>
+            </div>
             {snapshot.supported.map((market) => (
               <button
                 className={market.symbol === selected.symbol ? "market active" : "market"}
@@ -161,14 +207,14 @@ export function MarketConsole({ initialSnapshot }: Props) {
                 <span className="asset-token">{market.baseSymbol}</span>
                 <span>
                   <strong>{market.symbol}</strong>
-                  <small>Quoted in {market.quoteSymbol}</small>
+                  <small>{market.tradeCount} indexed fills</small>
                 </span>
                 <span className="market-arrow" aria-hidden="true">→</span>
               </button>
             ))}
             <div className="rail-note">
-              <span className="status-dot" />
-              {snapshot.marketCount} perp markets found
+              <span className="rail-note-icon" aria-hidden="true" />
+              <p><strong>Market discovery live</strong><small>{snapshot.marketCount} perps returned by the official indexer.</small></p>
             </div>
           </aside>
 
@@ -176,46 +222,55 @@ export function MarketConsole({ initialSnapshot }: Props) {
             <div className="capture-header">
               <div>
                 <p className="panel-label">Recorder status</p>
-                <h3>Ready for a verified testnet position</h3>
+                <h3>{selected.symbol} is ready to record.</h3>
               </div>
-              <span className="waiting-badge">Waiting for wallet</span>
+              <span className="waiting-badge"><i />Awaiting wallet</span>
             </div>
 
             <div className="market-summary">
               <div>
-                <span>Selected market</span>
+                <span>Instrument</span>
                 <strong>{selected.symbol}</strong>
               </div>
               <div>
-                <span>Pool</span>
+                <span>Last indexed price</span>
+                <strong>{selectedLastPrice}</strong>
+              </div>
+              <div>
+                <span>Protocol minimum</span>
+                <strong>{selectedMinimum}</strong>
+              </div>
+              <div>
+                <span>Pool contract</span>
                 <strong>{shortenAddress(selected.poolAddress)}</strong>
-              </div>
-              <div>
-                <span>Minimum quantity</span>
-                <strong>{selected.minQuantity} raw</strong>
-              </div>
-              <div>
-                <span>Trades indexed</span>
-                <strong>{selected.tradeCount}</strong>
               </div>
             </div>
 
             <div className="empty-flight">
-              <span className="radar" aria-hidden="true"><span /></span>
-              <div>
-                <h4>No position has been recorded yet.</h4>
+              <div className="empty-flight-copy">
+                <span className="radar" aria-hidden="true"><span /></span>
+                <div>
+                <p className="panel-label">Your next recording</p>
+                <h4>No black boxes from here.</h4>
                 <p>
-                  Connect a funded testnet wallet, place a supported perp order,
-                  and Downrail will correlate the transaction, fills, position,
-                  funding, and close into one evidence trail.
+                  Once a wallet is connected, every order event is collected into
+                  one chronological record. Nothing is signed by this screen yet.
                 </p>
+                </div>
+              </div>
+              <div className="recording-path" aria-label="Recording lifecycle">
+                <div className="path-step current"><span /> <p><strong>Market selected</strong><small>{selected.symbol} configuration verified</small></p></div>
+                <div className="path-step"><span /> <p><strong>Wallet linked</strong><small>Owner stays in control</small></p></div>
+                <div className="path-step"><span /> <p><strong>Events indexed</strong><small>Fills, funding, position changes</small></p></div>
+                <div className="path-step"><span /> <p><strong>Receipt ready</strong><small>Readable explanation with sources</small></p></div>
               </div>
             </div>
 
             <form className="account-lookup" onSubmit={inspectAccount}>
               <div>
-                <label htmlFor="account-address">Inspect an existing testnet wallet</label>
-                <p>Read-only. This does not connect, sign, or submit anything.</p>
+                <p className="panel-label">Already traded?</p>
+                <label htmlFor="account-address">Inspect an existing testnet wallet.</label>
+                <p>Paste a public address. The lookup is read-only and never asks for a signature.</p>
               </div>
               <div className="account-controls">
                 <input
@@ -225,11 +280,13 @@ export function MarketConsole({ initialSnapshot }: Props) {
                   placeholder="0x…"
                   spellCheck={false}
                   autoComplete="off"
+                  aria-describedby="account-privacy"
                 />
                 <button type="submit" disabled={isInspecting || account.trim().length === 0}>
-                  {isInspecting ? "Reading…" : "Inspect evidence"}
+                  {isInspecting ? "Reading…" : "Inspect trail"}
                 </button>
               </div>
+              <span className="sr-only" id="account-privacy">Public wallet address only. No signature is requested.</span>
             </form>
 
             {accountError ? <p className="account-error">{accountError}</p> : null}
@@ -276,75 +333,74 @@ export function MarketConsole({ initialSnapshot }: Props) {
             ) : null}
 
             <div className="capture-footer">
-              <p>
-                Live market configuration verified at {formatCheckedAt(snapshot.checkedAt)}.
-                No transaction has been prepared or signed.
-              </p>
-              <button className="connect-button" disabled>
-                Wallet connection next
-              </button>
+              <p><span className="status-dot" />Live market configuration verified. No transaction prepared.</p>
+              <span className="footer-state">Wallet signing comes with the backend phase</span>
             </div>
           </article>
         </div>
       </section>
 
       <section className="mechanics-section" id="mechanics">
-        <div className="section-heading compact">
+        <div className="mechanics-layout">
           <div>
-            <p className="eyebrow">What Downrail proves</p>
-            <h2>From one opaque number to a complete explanation.</h2>
+            <p className="eyebrow">What the recorder keeps</p>
+            <h2>A trade is not one number.</h2>
+            <p className="section-intro">A position moves through multiple contracts and events. Downrail preserves the sequence, then explains each contribution without pretending missing data exists.</p>
+            <a className="text-action" href="#proof">See the live proof <span aria-hidden="true">→</span></a>
           </div>
-        </div>
-        <div className="mechanic-grid">
-          <article>
-            <span className="mechanic-icon order-icon" aria-hidden="true" />
-            <h3>Order intent</h3>
-            <p>What the wallet asked for, on which market, and under which limits.</p>
-          </article>
-          <article>
-            <span className="mechanic-icon fill-icon" aria-hidden="true" />
-            <h3>Execution trail</h3>
-            <p>Which fills changed the position, in exact block and event order.</p>
-          </article>
-          <article>
-            <span className="mechanic-icon pnl-icon" aria-hidden="true" />
-            <h3>PnL explanation</h3>
-            <p>Price movement, funding, and realized outcome—never a mystery total.</p>
-          </article>
-          <article>
-            <span className="mechanic-icon proof-icon" aria-hidden="true" />
-            <h3>Proof package</h3>
-            <p>A redacted receipt with hashes and provenance behind every claim.</p>
-          </article>
+          <div className="mechanic-stream">
+            <article><span className="stream-icon intent-icon" aria-hidden="true" /><div><p className="panel-label">Wallet intent</p><h3>What was requested?</h3><p>Market, side, size, limit, account, and the transaction that carried the instruction.</p></div><small>Transaction source</small></article>
+            <article><span className="stream-icon execution-icon" aria-hidden="true" /><div><p className="panel-label">Execution</p><h3>What actually filled?</h3><p>Every partial fill stays in chain order, with quantity, price, role, block, and log position.</p></div><small>Indexer source</small></article>
+            <article><span className="stream-icon outcome-icon" aria-hidden="true" /><div><p className="panel-label">Position outcome</p><h3>Why did the result change?</h3><p>Price PnL and funding remain separate. Anything unavailable is named, never guessed.</p></div><small>Calculated + sourced</small></article>
+            <article><span className="stream-icon receipt-icon" aria-hidden="true" /><div><p className="panel-label">Receipt</p><h3>Can someone verify it?</h3><p>The final explanation carries hashes and provenance behind every visible claim.</p></div><small>Exportable proof</small></article>
+          </div>
         </div>
       </section>
 
       <section className="proof-section" id="proof">
         <div>
-          <p className="eyebrow light">Current verified capability</p>
-          <h2>Live market discovery is connected.</h2>
+          <p className="eyebrow light">Connected where it counts</p>
+          <h2>Proof before polish.</h2>
           <p>
-            Downrail is reading the official dreamDEX testnet indexer through the
-            Somnia Markets SDK. Order signing is intentionally still locked until
-            the wallet path is implemented and reviewed.
+            The interface is already reading the official dreamDEX testnet indexer
+            through the Somnia Markets SDK. We expose exactly what is live—and keep
+            signing locked until the transaction path is reviewed.
           </p>
         </div>
         <dl className="proof-ledger">
-          <div><dt>Chain ID</dt><dd>{snapshot.chainId}</dd></div>
-          <div><dt>Supported now</dt><dd>BTC-PERP · ETH-PERP</dd></div>
-          <div><dt>Evidence state</dt><dd>Verified live read</dd></div>
-          <div><dt>Signing state</dt><dd>Not enabled</dd></div>
+          <div><dt>Network</dt><dd>Somnia Hideki · {snapshot.chainId}</dd></div>
+          <div><dt>Instruments</dt><dd>BTC-PERP · ETH-PERP</dd></div>
+          <div><dt>Market records</dt><dd>{snapshot.marketCount} returned live</dd></div>
+          <div><dt>Evidence state</dt><dd><span className="ledger-dot" />Indexer verified</dd></div>
+          <div><dt>Signing state</dt><dd>Intentionally locked</dd></div>
         </dl>
       </section>
 
-      <footer>
+      <section className="final-cta">
         <div>
-          <span className="footer-wordmark">DOWNRAIL</span>
-          <p>A verifiable flight recorder for leveraged positions.</p>
+          <p className="eyebrow">Start with evidence</p>
+          <h2>Bring a position.<br />Leave with proof.</h2>
         </div>
-        <div className="footer-meta">
-          <span>Built for dreamDEX Perps</span>
-          <span>Somnia testnet only</span>
+        <a className="primary-action" href="#recorder">
+          Inspect a wallet <span><ArrowIcon /></span>
+        </a>
+      </section>
+
+      <footer>
+        <div className="footer-brand">
+          <a className="brand brand-light" href="#top" aria-label="Back to top">
+            <span className="brand-mark" aria-hidden="true"><span /></span>
+            <span>DOWNRAIL</span>
+          </a>
+          <p>The verifiable flight recorder for dreamDEX Perps.</p>
+        </div>
+        <div className="footer-links">
+          <div><span>Product</span><a href="#recorder">Recorder</a><a href="#mechanics">How it works</a></div>
+          <div><span>Evidence</span><a href="#proof">Live status</a><a href="#recorder">Inspect wallet</a></div>
+        </div>
+        <div className="footer-status">
+          <span><i className="status-dot" />Somnia testnet</span>
+          <small>Local build · No custody</small>
         </div>
       </footer>
     </main>
