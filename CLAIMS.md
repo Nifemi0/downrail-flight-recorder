@@ -13,6 +13,7 @@ Claims remain `Planned` until direct evidence exists. Verified claims link to re
 | C-007 | No user private key is sent to or stored by the application server. | Planned | Architecture review and secret scan |
 | C-008 | The local interface refreshes live dreamDEX market metadata without preparing or signing a transaction. | Verified | Manual browser check on October 23, 2026; `/api/markets`; `app/market-console.tsx` |
 | C-009 | Downrail can query indexed perp positions, fills, lifecycle changes, and funding for a valid EVM address. | Verified | `evidence/account-read-empty.json`; `/api/accounts/[address]`; all four sources responded successfully |
+| C-010 | The local interface can order indexed account event types into a read-only timeline and show source availability. | Verified in fixture; live populated wallet pending | `lib/dreamdex/receipt.test.ts`; `app/market-console.tsx`; 5 local tests passed October 23, 2026 |
 
 ## Claim policy
 

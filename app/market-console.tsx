@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { formatUnits } from "viem";
 
 import type { AccountRecorderSnapshot } from "@/lib/dreamdex/account";
+import { buildReceiptEvents, formatEventTime } from "@/lib/dreamdex/receipt";
 import type { MarketSnapshot } from "@/lib/dreamdex/markets";
 import { formatCheckedAt, shortenAddress } from "@/lib/format";
 
@@ -47,6 +48,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
   const selectedLastPrice = selected.lastPrice
     ? `${compactUnits(selected.lastPrice, selected.quoteDecimals)} ${selected.quoteSymbol}`
     : "Awaiting first fill";
+  const receiptEvents = accountSnapshot ? buildReceiptEvents(accountSnapshot) : [];
 
   async function refreshSnapshot() {
     setIsRefreshing(true);
@@ -336,38 +338,38 @@ export function MarketConsole({ initialSnapshot }: Props) {
               <div className="account-result">
                 <div className="account-result-head">
                   <div>
-                    <p className="panel-label">Indexed account evidence</p>
+                    <p className="panel-label">Your position record · Somnia testnet</p>
                     <h4>{shortenAddress(accountSnapshot.account, 10, 8)}</h4>
                   </div>
                   <span>{formatCheckedAt(accountSnapshot.checkedAt)}</span>
                 </div>
+                <p className="receipt-context">Downrail found the following indexed activity for this public wallet. This is a read-only account view; a complete trade PnL cannot be claimed until all required sources are available and matched to one position.</p>
                 <div className="evidence-counts">
                   <div><strong>{accountSnapshot.positions.length}</strong><span>Position rows</span></div>
                   <div><strong>{accountSnapshot.fills.length}</strong><span>Perp fills</span></div>
                   <div><strong>{accountSnapshot.positionChanges.length}</strong><span>Lifecycle events</span></div>
                   <div><strong>{accountSnapshot.funding.length}</strong><span>Funding records</span></div>
                 </div>
-                {accountSnapshot.positionChanges.length > 0 ? (
-                  <div className="event-list">
-                    {accountSnapshot.positionChanges.slice(0, 6).map((change) => (
-                      <article key={change.id}>
-                        <span className={`event-kind event-${change.kind.toLowerCase()}`}>{change.kind}</span>
-                        <div>
-                          <strong>{change.market} · {change.sideAfter}</strong>
-                          <small>Size {change.sizeBefore} → {change.sizeAfter}</small>
-                        </div>
-                        <div className="event-outcome">
-                          <strong>{change.realizedPricePnl} {selected.quoteSymbol}</strong>
-                          <small>Price PnL · block {change.blockNumber}</small>
-                        </div>
+                <div className="receipt-sources" aria-label="Indexer source status">
+                  {Object.entries(accountSnapshot.sourceStatus).map(([name, source]) => (
+                    <div key={name}><strong>{name.replace(/([A-Z])/g, " $1")}</strong><span className={source.state}>{source.state}</span><small>{source.detail}</small></div>
+                  ))}
+                </div>
+                {receiptEvents.length > 0 ? (
+                  <div className="receipt-timeline">
+                    <h5>What happened, in order</h5>
+                    {receiptEvents.slice(-30).map((event) => (
+                      <article key={event.id}>
+                        <span className="timeline-marker" aria-hidden="true" />
+                        <div><span className="event-kind">{event.kind}</span><h6>{event.market} · {event.title}</h6><p>{event.detail}</p><small>{formatEventTime(event.timestamp)}{event.blockNumber ? ` · block ${event.blockNumber}` : ""}</small></div>
+                        <code title={event.transactionHash}>{shortenAddress(event.transactionHash, 10, 8)}</code>
                       </article>
                     ))}
+                    {receiptEvents.length > 30 ? <p className="receipt-limit">Showing the latest 30 indexed events. Earlier activity is omitted from this view.</p> : null}
                   </div>
                 ) : (
                   <p className="no-events">
-                    No supported lifecycle rows were returned for this address. That can
-                    mean the wallet has not traded these markets or the indexer has not
-                    recorded the activity yet.
+                    No supported events were returned for this address. The wallet may not have traded these markets, or the indexer may not have recorded its activity yet. Check the source status above.
                   </p>
                 )}
               </div>

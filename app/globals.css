@@ -201,6 +201,24 @@ h1 span:last-child { color: var(--blue); }
 .account-result-head { padding: 24px 30px; display: flex; justify-content: space-between; align-items: end; gap: 20px; }
 .account-result-head h4 { margin: 8px 0 0; font-family: "SFMono-Regular", Consolas, monospace; font-size: 1rem; }
 .account-result-head > span { color: var(--muted); font-family: "SFMono-Regular", Consolas, monospace; font-size: .62rem; }
+.receipt-context { margin: 0; max-width: 850px; padding: 0 30px 24px; color: var(--muted); font-size: .78rem; line-height: 1.55; }
+.receipt-sources { padding: 22px 30px; display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; border-bottom: 1px solid var(--line); }
+.receipt-sources > div { padding: 14px; border: 1px solid var(--line); border-radius: 12px; }
+.receipt-sources strong, .receipt-sources small { display: block; }
+.receipt-sources strong { text-transform: capitalize; font-size: .68rem; }
+.receipt-sources span { display: inline-block; margin-top: 7px; color: var(--success); font-family: Consolas, monospace; font-size: .63rem; }
+.receipt-sources span.unavailable { color: var(--danger); }
+.receipt-sources small { margin-top: 6px; color: var(--muted); font-size: .61rem; line-height: 1.4; overflow-wrap: anywhere; }
+.receipt-timeline { padding: 24px 30px 30px; }
+.receipt-timeline h5 { margin: 0 0 20px; font-size: 1.12rem; letter-spacing: -.025em; }
+.receipt-timeline article { padding: 0 0 23px; display: grid; grid-template-columns: 15px minmax(0,1fr) auto; gap: 14px; position: relative; }
+.receipt-timeline article:not(:last-of-type)::before { content: ""; position: absolute; top: 13px; bottom: 0; left: 5px; width: 1px; background: var(--line); }
+.timeline-marker { width: 11px; height: 11px; margin-top: 3px; border-radius: 50%; background: var(--blue); z-index: 1; }
+.receipt-timeline h6 { margin: 7px 0 3px; font-size: .82rem; }
+.receipt-timeline p { margin: 0 0 4px; color: var(--muted); font-size: .72rem; }
+.receipt-timeline small, .receipt-timeline code { color: #8a8b92; font-size: .61rem; overflow-wrap: anywhere; }
+.receipt-timeline code { text-align: right; }
+.receipt-limit { color: var(--muted); font-size: .72rem; }
 .evidence-counts { display: grid; grid-template-columns: repeat(4,1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .evidence-counts div { padding: 18px 22px; border-right: 1px solid var(--line); }
 .evidence-counts div:last-child { border-right: 0; }
@@ -334,6 +352,11 @@ footer { padding: 54px max(24px, calc((100vw - 1320px)/2)); display: grid; grid-
   .account-lookup { grid-template-columns: 1fr; padding: 24px 18px; }
   .account-controls { grid-template-columns: 1fr; }
   .account-result-head { align-items: flex-start; flex-direction: column; padding: 22px 18px; }
+  .receipt-context { padding: 0 18px 20px; }
+  .receipt-sources { padding: 18px; grid-template-columns: 1fr 1fr; }
+  .receipt-timeline { padding: 20px 18px; }
+  .receipt-timeline article { grid-template-columns: 15px minmax(0,1fr); }
+  .receipt-timeline code { grid-column: 2; text-align: left; }
   .evidence-counts { grid-template-columns: 1fr 1fr; }
   .evidence-counts div:nth-child(2) { border-right: 0; }
   .evidence-counts div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
