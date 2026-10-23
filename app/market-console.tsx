@@ -102,8 +102,8 @@ export function MarketConsole({ initialSnapshot }: Props) {
           <span>DOWNRAIL</span>
         </a>
         <nav aria-label="Primary navigation">
-          <a href="#recorder">Live recorder</a>
-          <a href="#mechanics">How it works</a>
+          <a href="#explain">What it solves</a>
+          <a href="#recorder">Try it</a>
           <a href="#proof">Network proof</a>
         </nav>
         <div className="network-pill">
@@ -114,40 +114,41 @@ export function MarketConsole({ initialSnapshot }: Props) {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">Position intelligence for dreamDEX Perps</p>
+          <p className="eyebrow">A readable trade record for dreamDEX Perps</p>
           <h1>
-            <span>Every trade,</span>
-            <span>finally explained.</span>
+            <span>Paste a wallet.</span>
+            <span>Understand the trade.</span>
           </h1>
           <p className="hero-description">
-            Downrail turns scattered order, fill, funding, and PnL events into one
-            readable position receipt—with the source behind every number.
+            Downrail reads public testnet activity and rebuilds each perp position
+            as a plain-English timeline: what was requested, what filled, what funding
+            changed, and where the final result came from.
           </p>
           <div className="hero-actions">
             <a className="primary-action" href="#recorder">
               Open live recorder <span><ArrowIcon /></span>
             </a>
-            <a className="text-action" href="#mechanics">
-              See how it works <span aria-hidden="true">→</span>
+            <a className="text-action" href="#explain">
+              See a simple example <span aria-hidden="true">→</span>
             </a>
           </div>
           <div className="hero-facts" aria-label="Current product status">
             <div><strong>{snapshot.marketCount}</strong><span>live perp markets</span></div>
             <div><strong>{snapshot.chainId}</strong><span>Somnia chain</span></div>
-            <div><strong>Read only</strong><span>until you sign</span></div>
+            <div><strong>No custody</strong><span>your funds stay in your wallet</span></div>
           </div>
         </div>
 
         <div className="hero-visual" aria-label="Illustrative Downrail position receipt">
           <div className="preview-shell">
             <div className="preview-toolbar">
-              <div><span className="preview-logo" />Position receipt</div>
+              <div><span className="preview-logo" />What happened to this position?</div>
               <span className="preview-live"><i /> Product preview</span>
             </div>
             <div className="preview-position">
               <div>
-                <span>ETH-PERP · LONG</span>
-                <strong>Position story</strong>
+                <span>PUBLIC WALLET · ETH-PERP LONG</span>
+                <strong>Your result, broken down</strong>
               </div>
               <div className="preview-pnl">
                 <span>Explained PnL</span>
@@ -173,7 +174,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
               <div className="preview-event active"><i /><span><strong>Position outcome</strong><small>Price PnL and funding separated</small></span><b>Explained</b></div>
             </div>
           </div>
-          <div className="floating-proof"><span>Source coverage</span><strong>3 / 3</strong><small>Every claim traceable</small></div>
+          <div className="floating-proof"><span>Downrail output</span><strong>1 receipt</strong><small>Timeline + sources + result</small></div>
         </div>
       </section>
 
@@ -184,12 +185,43 @@ export function MarketConsole({ initialSnapshot }: Props) {
         <span>Read-only until you sign</span>
       </div>
 
+      <section className="explain-section" id="explain">
+        <div className="explain-heading">
+          <p className="eyebrow">The problem Downrail solves</p>
+          <h2>Your exchange shows a PnL number.<br />Downrail shows where it came from.</h2>
+          <p>A perp position is spread across orders, partial fills, funding payments, and position updates. Downrail joins those records into one sequence a trader can actually follow.</p>
+        </div>
+
+        <div className="comparison-card">
+          <div className="comparison-before">
+            <span className="comparison-label">Without Downrail</span>
+            <p>Exchange result</p>
+            <strong>+$184.20</strong>
+            <small>You know the outcome, but not the full reason.</small>
+          </div>
+          <div className="comparison-arrow" aria-hidden="true"><ArrowIcon /></div>
+          <div className="comparison-after">
+            <span className="comparison-label">With Downrail</span>
+            <div><span>Price movement</span><strong>+$210.00</strong></div>
+            <div><span>Funding paid</span><strong>−$25.80</strong></div>
+            <div className="comparison-total"><span>Explained result</span><strong>+$184.20</strong></div>
+            <small>Illustrative breakdown. Each live value keeps its indexer or chain source.</small>
+          </div>
+        </div>
+
+        <div className="how-flow" aria-label="How Downrail works">
+          <article><span>1</span><div><h3>Enter a public wallet</h3><p>No deposit and no private key. Downrail only reads supported testnet activity.</p></div></article>
+          <article><span>2</span><div><h3>We rebuild the sequence</h3><p>Orders, fills, funding, and position changes are placed in chronological order.</p></div></article>
+          <article><span>3</span><div><h3>You get a readable record</h3><p>See what changed the position and keep the source behind every available claim.</p></div></article>
+        </div>
+      </section>
+
       <section className="recorder-section" id="recorder">
         <div className="section-heading">
           <div>
             <p className="eyebrow">Live testnet workspace</p>
             <h2>From wallet address<br />to a clear position story.</h2>
-            <p className="section-intro">Choose a live market or inspect a wallet that has already traded. Downrail rebuilds the sequence without asking you to surrender control.</p>
+            <p className="section-intro">Choose a supported market, then paste a public wallet that has traded it. The current build reads indexed evidence only—nothing is signed or moved.</p>
           </div>
           <div className="refresh-stack">
             <span>Last verified {formatCheckedAt(snapshot.checkedAt)}</span>

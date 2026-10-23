@@ -49,7 +49,7 @@ An editorial report aesthetic that treats each trade like a clean case study.
 
 ## Translation across surfaces
 
-- Landing: product-first hero, live connection strip, recorder workspace, explanation flow, network proof, final CTA.
+- Landing: plain-language promise, input/output preview, concrete PnL breakdown, three-step explanation, live recorder workspace, network proof, final CTA.
 - App: the same cards, typography, selection states, receipt timeline, and address inspection control.
 - Docs: warm canvas, restrained blue callouts, narrower reading width, identical evidence terminology.
 - Mobile: single-column narrative, no hidden primary action, simplified preview labels, full-width controls.
@@ -61,3 +61,13 @@ An editorial report aesthetic that treats each trade like a clean case study.
 - Do not invent live data in functional areas; illustrative values must be labeled as product preview.
 - Preserve all current market and wallet-reading mechanics during visual work.
 - Keep local until the owner explicitly requests deployment.
+
+## Product story hierarchy
+
+The landing page must answer these questions in order:
+
+1. What is it? A readable trade record for dreamDEX perpetual positions.
+2. What does the user provide? A public testnet wallet address.
+3. What does Downrail do? It joins supported order, fill, funding, and position-change events chronologically.
+4. What does the user receive? A readable position record with the available source behind each claim.
+5. What does it not do? It does not take custody, request a private key, move funds, or sign from the current interface.
