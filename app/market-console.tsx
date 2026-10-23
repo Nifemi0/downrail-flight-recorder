@@ -102,9 +102,9 @@ export function MarketConsole({ initialSnapshot }: Props) {
           <span>DOWNRAIL</span>
         </a>
         <nav aria-label="Primary navigation">
+          <a href="#recorder">Live recorder</a>
           <a href="#mechanics">How it works</a>
-          <a href="#recorder">Recorder</a>
-          <a href="#proof">Proof</a>
+          <a href="#proof">Network proof</a>
         </nav>
         <div className="network-pill">
           <span className="status-dot" />
@@ -114,21 +114,21 @@ export function MarketConsole({ initialSnapshot }: Props) {
 
       <section className="hero" id="top">
         <div className="hero-copy">
-          <p className="eyebrow">The black box for dreamDEX Perps</p>
+          <p className="eyebrow">Position intelligence for dreamDEX Perps</p>
           <h1>
-            <span>Every trade</span>
-            <span>leaves a trail.</span>
+            <span>Every trade,</span>
+            <span>finally explained.</span>
           </h1>
           <p className="hero-description">
-            Downrail records a position from intent to outcome, then turns the raw
-            chain events into one receipt a trader can read, verify, and share.
+            Downrail turns scattered order, fill, funding, and PnL events into one
+            readable position receipt—with the source behind every number.
           </p>
           <div className="hero-actions">
             <a className="primary-action" href="#recorder">
-              Open the recorder <span><ArrowIcon /></span>
+              Open live recorder <span><ArrowIcon /></span>
             </a>
             <a className="text-action" href="#mechanics">
-              See the evidence flow <span aria-hidden="true">→</span>
+              See how it works <span aria-hidden="true">→</span>
             </a>
           </div>
           <div className="hero-facts" aria-label="Current product status">
@@ -138,49 +138,58 @@ export function MarketConsole({ initialSnapshot }: Props) {
           </div>
         </div>
 
-        <div className="hero-visual" aria-label="Trade evidence flowing into a receipt">
-          <div className="signal-grid" aria-hidden="true" />
-          <div className="orbit orbit-one" aria-hidden="true" />
-          <div className="orbit orbit-two" aria-hidden="true" />
-          <div className="evidence-node node-order"><span />Order intent</div>
-          <div className="evidence-node node-fill"><span />Ordered fills</div>
-          <div className="evidence-node node-funding"><span />Funding</div>
-          <div className="receipt-card">
-            <div className="receipt-card-top">
-              <span>RECEIPT ANATOMY</span>
-              <span className="verified-label">ILLUSTRATIVE</span>
+        <div className="hero-visual" aria-label="Illustrative Downrail position receipt">
+          <div className="preview-shell">
+            <div className="preview-toolbar">
+              <div><span className="preview-logo" />Position receipt</div>
+              <span className="preview-live"><i /> Product preview</span>
             </div>
-            <strong>One position. One provable story.</strong>
-            <div className="receipt-line">
-              <span>Order intent</span>
-              <span>TX + PARAMETERS</span>
+            <div className="preview-position">
+              <div>
+                <span>ETH-PERP · LONG</span>
+                <strong>Position story</strong>
+              </div>
+              <div className="preview-pnl">
+                <span>Explained PnL</span>
+                <strong>+$184.20</strong>
+              </div>
             </div>
-            <div className="receipt-line">
-              <span>Execution</span>
-              <span>ORDERED FILLS</span>
+            <div className="preview-chart" aria-hidden="true">
+              <svg viewBox="0 0 560 150" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="currentColor" stopOpacity=".22" />
+                    <stop offset="1" stopColor="currentColor" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path className="chart-area" d="M0 125 C60 118 83 82 142 93 S230 110 284 66 S372 72 420 39 S500 48 560 16 L560 150 L0 150Z" />
+                <path className="chart-line" d="M0 125 C60 118 83 82 142 93 S230 110 284 66 S372 72 420 39 S500 48 560 16" />
+              </svg>
+              <span className="chart-cursor" />
             </div>
-            <div className="receipt-line">
-              <span>Outcome</span>
-              <span>PNL + FUNDING</span>
+            <div className="preview-events">
+              <div className="preview-event complete"><i /><span><strong>Order intent</strong><small>Long 1.20 ETH · source linked</small></span><b>Verified</b></div>
+              <div className="preview-event complete"><i /><span><strong>Execution</strong><small>3 fills · ordered by block</small></span><b>Indexed</b></div>
+              <div className="preview-event active"><i /><span><strong>Position outcome</strong><small>Price PnL and funding separated</small></span><b>Explained</b></div>
             </div>
-            <div className="receipt-proof"><span className="proof-check" />Every line keeps its source.</div>
           </div>
+          <div className="floating-proof"><span>Source coverage</span><strong>3 / 3</strong><small>Every claim traceable</small></div>
         </div>
       </section>
 
       <div className="connection-band" aria-label="Live connection status">
-        <span><i className="status-dot" />Live SDK connection</span>
-        <span>BTC-PERP + ETH-PERP</span>
-        <span>Indexer-backed evidence</span>
-        <span>No custody. No hidden signing.</span>
+        <span><i className="status-dot" />Official SDK connected</span>
+        <span>{snapshot.marketCount} markets indexed</span>
+        <span>BTC-PERP + ETH-PERP ready</span>
+        <span>Read-only until you sign</span>
       </div>
 
       <section className="recorder-section" id="recorder">
         <div className="section-heading">
           <div>
             <p className="eyebrow">Live testnet workspace</p>
-            <h2>Record first.<br />Explain everything.</h2>
-            <p className="section-intro">Start with a live market or inspect a wallet that has already traded. Downrail keeps the evidence together from the first event.</p>
+            <h2>From wallet address<br />to a clear position story.</h2>
+            <p className="section-intro">Choose a live market or inspect a wallet that has already traded. Downrail rebuilds the sequence without asking you to surrender control.</p>
           </div>
           <div className="refresh-stack">
             <span>Last verified {formatCheckedAt(snapshot.checkedAt)}</span>
@@ -250,8 +259,8 @@ export function MarketConsole({ initialSnapshot }: Props) {
               <div className="empty-flight-copy">
                 <span className="radar" aria-hidden="true"><span /></span>
                 <div>
-                <p className="panel-label">Your next recording</p>
-                <h4>No black boxes from here.</h4>
+                <p className="panel-label">Your next receipt</p>
+                <h4>Build a clear position record.</h4>
                 <p>
                   Once a wallet is connected, every order event is collected into
                   one chronological record. Nothing is signed by this screen yet.
@@ -344,7 +353,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
         <div className="mechanics-layout">
           <div>
             <p className="eyebrow">What the recorder keeps</p>
-            <h2>A trade is not one number.</h2>
+          <h2>Your PnL deserves an explanation.</h2>
             <p className="section-intro">A position moves through multiple contracts and events. Downrail preserves the sequence, then explains each contribution without pretending missing data exists.</p>
             <a className="text-action" href="#proof">See the live proof <span aria-hidden="true">→</span></a>
           </div>
@@ -360,7 +369,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
       <section className="proof-section" id="proof">
         <div>
           <p className="eyebrow light">Connected where it counts</p>
-          <h2>Proof before polish.</h2>
+          <h2>Built on live evidence.</h2>
           <p>
             The interface is already reading the official dreamDEX testnet indexer
             through the Somnia Markets SDK. We expose exactly what is live—and keep
@@ -379,7 +388,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
       <section className="final-cta">
         <div>
           <p className="eyebrow">Start with evidence</p>
-          <h2>Bring a position.<br />Leave with proof.</h2>
+          <h2>Bring a wallet.<br />Leave with clarity.</h2>
         </div>
         <a className="primary-action" href="#recorder">
           Inspect a wallet <span><ArrowIcon /></span>
@@ -392,7 +401,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
             <span className="brand-mark" aria-hidden="true"><span /></span>
             <span>DOWNRAIL</span>
           </a>
-          <p>The verifiable flight recorder for dreamDEX Perps.</p>
+          <p>Readable, verifiable position intelligence for dreamDEX Perps.</p>
         </div>
         <div className="footer-links">
           <div><span>Product</span><a href="#recorder">Recorder</a><a href="#mechanics">How it works</a></div>

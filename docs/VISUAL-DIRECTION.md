@@ -1,56 +1,63 @@
-# Visual Direction: Black Box Evidence Lab
+# Downrail visual direction: Precision Ledger
 
-## Perception
+## Product perception
 
-Downrail Flight Recorder should feel forensic, exact, high-stakes, and operational. It is not a trading terminal and should not inherit the mint-and-lime protection-product language of the earlier Downrail interface.
+Downrail should feel understandable, credible, active, and polished. It is a position-intelligence product for dreamDEX Perps—not a cyberpunk terminal, insurance storefront, or generic crypto dashboard.
 
 ## Directions considered
 
-### Physical black box
+### Precision Ledger — selected
 
-Safety orange, carbon hardware, stamped identifiers, machined geometry, and a single recorder-like focal object. Strongest product recognition, but can become novelty hardware if the information hierarchy is weak.
+A calm, product-led financial interface where the working receipt is the visual identity. Warm neutral space, crisp typography, one electric blue accent, a small lime confirmation color, and interactive product proof.
 
-### Mission telemetry
+- Best fit: makes a complex product easier to understand while still feeling distinctive.
+- Risk: can become generic SaaS if the position receipt and evidence model are not kept prominent.
+- Reference principles: [Tessel Finance](https://www.framer.com/marketplace/templates/tessel-finance/) for interactive product demonstration, [Basis Treasury](https://www.framer.com/marketplace/templates/basis-treasury/) for live proof instead of claims, and [Saasyy](https://www.framer.com/marketplace/templates/saasyy/) for spacing and type discipline.
 
-Midnight blue, instrument cyan, compact status rows, and animated traces informed by modern spacecraft displays. Excellent for the app surface, but a full HUD treatment risks feeling like generic sci-fi.
+### Signal Room
 
-### Incident report
+A darker market-intelligence interface built around dense charts and monitoring states.
 
-Warm evidence paper, redactions, case stamps, and document-led layouts. Strong for receipts and exports, but too static for a live recorder workspace.
+- Strength: technical and immediate.
+- Rejected: too close to the previous black-box direction and too intimidating for first-time users.
 
-## Selected system
+### Position Journal
 
-**Black Box Evidence Lab** combines the physical black-box focal point with mission-telemetry interaction and incident-report receipts.
+An editorial report aesthetic that treats each trade like a clean case study.
 
-- Carbon is the operational base.
-- Recorder orange is reserved for capture, active state, and proof.
-- Instrument blue marks live indexed data.
-- Bone white carries readable reports and long copy.
-- Corners are clipped or lightly rounded rather than soft fintech capsules.
-- Monospace is used for chain data, timestamps, hashes, and provenance.
-- Motion represents scanning, recording, and event progression; it is disabled under reduced-motion preferences.
+- Strength: excellent for exported receipts and documentation.
+- Rejected as the primary language: too static for the live recorder workspace.
 
-## References and extracted principles
+## Visual system
 
-- [NASA Human Factors Design Across the Artemis Fleet](https://ntrs.nasa.gov/api/citations/20240008838/downloads/AABI%20Keynote%20July%202024%20FINAL.pdf) — prioritize system state, hierarchy, and human-readable critical information.
-- [SpaceX Dragon](https://new.spacex.com/vehicles/dragon) — focus a complex system into a small number of deliberate surfaces.
-- [Teenage Engineering](https://teenage.engineering/) — let product-object character, compact labels, and industrial restraint create memorability.
-- [Altara telemetry components](https://github.com/JayaSaiKishanChapparam/altara) — MIT-licensed implementation reference for telemetry vocabulary and instrument patterns; no source is copied into this build.
-- [Spline examples](https://spline.design/examples) — future reference for a scoped recorder-object scene only if it explains the capture model and ships with static/mobile fallbacks.
-- [Motion for React](https://motion.dev/docs/react) — optional implementation reference for future event transitions; the first slice uses CSS only.
-- [Radix Primitives](https://www.radix-ui.com/primitives) — optional accessible behavior layer for future dialogs, tabs, and disclosures.
+- Canvas: warm neutral `#F5F5F0`
+- Surface: white `#FFFFFF`
+- Ink: near-black `#111217`
+- Primary accent: electric blue `#5361FF`
+- Confirmation accent: lime `#C6FF5E`
+- Success: deep teal `#13866F`
+- Type: modern grotesk/system sans for explanations; monospace only for addresses, data, and provenance.
+- Geometry: 10–26px radii, disciplined cards, no glassmorphism, no giant decorative capsules.
+- Motion: one chart pulse and subtle hover lift; all motion disabled under reduced-motion preferences.
+
+## Signature moves
+
+1. The hero shows a believable position receipt instead of abstract decoration.
+2. The live recorder workspace is the visual centerpiece, not a screenshot buried below marketing copy.
+3. Blue communicates active analysis; lime is reserved for confirmation and action completion.
+4. Every technical number remains paired with a plain-language label.
 
 ## Translation across surfaces
 
-- Landing: large thesis, physical recorder/evidence object, live connection strip, one primary action.
-- App: dark operations panel with orange active states and instrument-blue live data.
-- Receipt: bone evidence sheet with hashes, provenance, and no decorative dashboard chrome.
-- Docs: bone canvas, black typographic hierarchy, orange callouts, blue source links.
-- Mobile: product thesis first, recorder object second, horizontal data tables converted into grouped rows.
+- Landing: product-first hero, live connection strip, recorder workspace, explanation flow, network proof, final CTA.
+- App: the same cards, typography, selection states, receipt timeline, and address inspection control.
+- Docs: warm canvas, restrained blue callouts, narrower reading width, identical evidence terminology.
+- Mobile: single-column narrative, no hidden primary action, simplified preview labels, full-width controls.
 
 ## Boundaries
 
-- No fake telemetry or decorative metrics.
-- No full-screen 3D behind text.
-- No neon-green fintech palette, glass cards, gradient blobs, or pill-heavy component styling.
-- No claims that are not backed by the live indexer or saved evidence.
+- Do not reuse Downrail's former mint/orange editorial language.
+- Do not use decorative slash-number labels.
+- Do not invent live data in functional areas; illustrative values must be labeled as product preview.
+- Preserve all current market and wallet-reading mechanics during visual work.
+- Keep local until the owner explicitly requests deployment.
