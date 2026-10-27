@@ -1,0 +1,141 @@
+{
+  "product": "Downrail Flight Recorder",
+  "network": "Somnia Hideki testnet",
+  "chainId": 50383,
+  "account": "0x249e79De269e54a901A3d2Ce660496563103b470",
+  "checkedAt": "2026-10-26T22:18:36.270Z",
+  "source": "dreamDEX indexer",
+  "coverage": "Observed records only; history may be incomplete. Fills are matched by transaction and market; individual order attribution is not independently verified. Funding, fees, and complete net PnL are not calculated.",
+  "sourceStatus": {
+    "positions": {
+      "state": "indexed",
+      "detail": "1 supported rows on this page.",
+      "hasMore": false
+    },
+    "openOrders": {
+      "state": "indexed",
+      "detail": "0 supported rows on this page.",
+      "hasMore": false
+    },
+    "orderHistory": {
+      "state": "indexed",
+      "detail": "2 supported rows on this page.",
+      "hasMore": false
+    },
+    "fills": {
+      "state": "indexed",
+      "detail": "2 supported rows on this page.",
+      "hasMore": false
+    },
+    "positionChanges": {
+      "state": "indexed",
+      "detail": "2 supported rows on this page.",
+      "hasMore": false
+    },
+    "funding": {
+      "state": "indexed",
+      "detail": "0 supported rows on this page.",
+      "hasMore": false
+    },
+    "marginEvents": {
+      "state": "indexed",
+      "detail": "2 supported rows on this page.",
+      "hasMore": false
+    },
+    "liquidations": {
+      "state": "indexed",
+      "detail": "0 supported rows on this page.",
+      "hasMore": false
+    }
+  },
+  "morePagesAvailable": false,
+  "receipt": {
+    "id": "ETH-PERP:34005026_24",
+    "market": "ETH-PERP",
+    "startObserved": true,
+    "end": "closed",
+    "changes": [
+      {
+        "id": "34005026_24",
+        "market": "ETH-PERP",
+        "kind": "OPEN",
+        "sideAfter": "Long",
+        "sizeBefore": "0",
+        "sizeAfter": "0.004",
+        "realizedPricePnl": "0",
+        "timestamp": "1793052674",
+        "transactionHash": "0x15766748dfd03bd61d5e786f9d4ec9177f2c82763b401ad78ac5a2762453fe95",
+        "blockNumber": "34005026",
+        "logIndex": 24
+      },
+      {
+        "id": "34007780_2",
+        "market": "ETH-PERP",
+        "kind": "CLOSE",
+        "sideAfter": "Flat",
+        "sizeBefore": "0.004",
+        "sizeAfter": "0",
+        "realizedPricePnl": "-0.00652",
+        "timestamp": "1793052949",
+        "transactionHash": "0xa17812dca463b120ceb1c1b51acbd2115a4892cd5eb91d9f46bb2cef24532721",
+        "blockNumber": "34007780",
+        "logIndex": 2
+      }
+    ],
+    "fills": [
+      {
+        "id": "34007780_5",
+        "market": "ETH-PERP",
+        "role": "Taker",
+        "side": "Sell",
+        "quantity": "0.004",
+        "price": "2306.86",
+        "timestamp": "1793052949",
+        "transactionHash": "0xa17812dca463b120ceb1c1b51acbd2115a4892cd5eb91d9f46bb2cef24532721",
+        "blockNumber": "34007780",
+        "logIndex": 5,
+        "orderId": "110680464442267218511"
+      },
+      {
+        "id": "34005026_27",
+        "market": "ETH-PERP",
+        "role": "Taker",
+        "side": "Buy",
+        "quantity": "0.004",
+        "price": "2308.49",
+        "timestamp": "1793052674",
+        "transactionHash": "0x15766748dfd03bd61d5e786f9d4ec9177f2c82763b401ad78ac5a2762453fe95",
+        "blockNumber": "34005026",
+        "logIndex": 27,
+        "orderId": "16251581528938124881773"
+      }
+    ],
+    "orders": [
+      {
+        "id": "0xd6cb1dd58580b84d76068ac21594219ce03aeddf_110680464442267218511",
+        "market": "ETH-PERP",
+        "status": "Filled",
+        "side": "Sell",
+        "quantity": "0.004",
+        "filledQuantity": "0.004",
+        "price": "2305",
+        "placedAt": "1793052949",
+        "lastUpdatedAt": "1793052949",
+        "placedTransactionHash": "0xa17812dca463b120ceb1c1b51acbd2115a4892cd5eb91d9f46bb2cef24532721"
+      },
+      {
+        "id": "0xd6cb1dd58580b84d76068ac21594219ce03aeddf_16251581528938124881773",
+        "market": "ETH-PERP",
+        "status": "Filled",
+        "side": "Buy",
+        "quantity": "0.004",
+        "filledQuantity": "0.004",
+        "price": "2311",
+        "placedAt": "1793052674",
+        "lastUpdatedAt": "1793052674",
+        "placedTransactionHash": "0x15766748dfd03bd61d5e786f9d4ec9177f2c82763b401ad78ac5a2762453fe95"
+      }
+    ],
+    "observedPricePnl": "-0.00652"
+  }
+}

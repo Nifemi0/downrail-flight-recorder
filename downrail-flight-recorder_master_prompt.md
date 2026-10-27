@@ -4,7 +4,7 @@
 
 Downrail Flight Recorder is an explainability layer for real dreamDEX Perps positions on the Somnia Tokyo/Hideki testnet.
 
-It is being built for the dreamDEX Perps Builder Bounty. Public secondary summaries describe two lanes: a feedback track and an MVP track. We are entering the **MVP track**. The earliest reported deadline is **November 1, 2026 at 23:59 UTC**; the DoraHacks/Eventbrite display also extends into November 2 in another timezone. Until the official page is manually confirmed, use November 1 at 23:59 UTC as the hard deadline and October 31 as the internal submission target.
+It is being built for the dreamDEX Perps Builder Bounty. The official DoraHacks page lists feedback and MVP tracks; we are entering the **MVP track**. The confirmed deadline is **November 1, 2026 at 23:59 UTC** (November 2, 00:59 Lagos time); the internal target is October 31. A repo, real testnet perp order and two or three tagged X posts linked from the README are required.
 
 > **Every leveraged trade should explain itself.**
 

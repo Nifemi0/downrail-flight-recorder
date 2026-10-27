@@ -2,21 +2,21 @@
 
 ## Eligibility and rules
 
-- [ ] Confirm the DoraHacks email is whitelisted.
-- [ ] Manually confirm exact deadline and timezone on the official event page.
+- [x] DoraHacks whitelist access confirmed by the owner on October 27, 2026; final submission access not independently verified.
+- [x] Confirm exact deadline and timezone on the official event page: November 1, 23:59 UTC.
 - [ ] Confirm team size and participant eligibility.
-- [ ] Confirm MVP prize split and judging criteria.
+- [x] Confirm MVP prize split and judging criteria: $300 initially and $200 conditional on a mainnet order; potential, building evidence and communication.
 - [ ] Confirm whether a public deployment is mandatory.
 - [ ] Confirm demo video requirement and maximum length.
-- [ ] Confirm X-post timing requirement.
+- [x] Confirm X-post requirement: README must link two or three posts tagging @DreamDEXSomnia.
 - [ ] Disclose any reused Downrail code, assets, or branding if required.
 
 ## Product
 
-- [ ] Read live dreamDEX perp markets.
-- [ ] Place a real supported testnet perp order.
-- [ ] Capture transaction, order, fill, and position evidence.
-- [ ] Reduce or close the position.
+- [x] Read live dreamDEX perp markets.
+- [x] Place a real supported testnet perp order.
+- [x] Capture opening transaction, order, fill, and position evidence: `evidence/owner-testnet-open.json`.
+- [x] Close the position in the owner-controlled testnet example; capture `evidence/owner-testnet-close.json`.
 - [ ] Generate the explainable receipt.
 - [ ] Verify every receipt row against evidence.
 - [ ] Verify error and unavailable-data states.
@@ -37,7 +37,7 @@
 
 - [ ] Live URL prepared and tested if required.
 - [ ] Demo video under three minutes prepared as a safe default.
-- [ ] X post drafted with real proof links.
+- [ ] Publish two or three accurate X posts and link them in the README; drafts exist locally.
 - [ ] DoraHacks title, tagline, description, repo, demo, and team fields drafted.
 - [ ] Screenshot and social image reflect the actual product.
 - [ ] `CLAIMS.md` is current.

@@ -10,3 +10,6 @@ coverage/
 evidence/private/
 *.tsbuildinfo
 
+
+# Local unfinished demo draft
+/demo-video/

@@ -1,6 +1,6 @@
 # Event Dossier — dreamDEX Perps Builder Bounty
 
-> Research artifact accessed October 23, 2026. Facts not available from the official DoraHacks page are explicitly marked secondary or unknown.
+> Official DoraHacks details checked October 26, 2026. The organizer has made the public builds list private.
 
 ## Event facts
 
@@ -8,8 +8,7 @@
 - **Format:** online builder bounty focused on dreamDEX Perps.
 - **Public event listing:** https://www.eventbrite.com/e/dreamdex-perps-builder-bounty-tickets-2003605109819
 - **Official submission page:** https://dorahacks.io/hackathon/dreamdex-perps-bounty/detail
-- **Dates:** Eventbrite displays October 19–November 2, 2026 in PDT. A secondary competition summary reports a deadline of November 1, 2026 at 23:59 UTC.
-- **Safety deadline:** November 1, 2026 at 23:59 UTC until manually confirmed on DoraHacks.
+- **Deadline:** November 1, 2026 at 23:59 UTC, confirmed on DoraHacks (November 2 at 00:59 Lagos time).
 - **Internal target:** October 31, 2026.
 - **Eligibility:** registration is open, but submission requires a whitelisted email. Selected builders from the prior dreamDEX Event Contracts hackathon were invited.
 - **Team size:** unknown.
@@ -17,14 +16,14 @@
 
 ## Money and tracks
 
-Secondary summary: https://www.competehub.dev/en/competitions/dorahacksdreamdex-perps-bounty
+Official source: https://dorahacks.io/hackathon/dreamdex-perps-bounty/detail
 
 | Track | Reported prize | Focus | Confidence |
 |---|---:|---|---|
-| Feedback | Up to $1,500 pool | Reproducible API, SDK, documentation, and app issues | Secondary source |
-| MVP | 3 × $500 | A perps product worth using | Secondary source |
+| Feedback | Up to $1,500 pool | Reproducible API, SDK, documentation, and app issues | Official |
+| MVP | 3 × $500 | A perps product worth using; $300 initially, $200 conditional on a mainnet order within the organizer's stated window | Official |
 
-Reported total pool: **$3,000**. Confirm on the official DoraHacks page before using this in public copy.
+Total pool: **$3,000**.
 
 ## Sponsor agenda
 
@@ -48,13 +47,7 @@ Primary documentation:
 
 ## Judging
 
-Published weights were not found.
-
-A secondary summary says MVPs are judged on:
-
-- Potential.
-- Building evidence.
-- Communication.
+Published weights were not found. The official page lists MVP potential (user value, scope, repeat use and execution), evidence of building (testnet orders, transaction hashes, repo and demo), and communication (quality and accuracy of X posts).
 
 Fallback planning rubric used for candidate selection:
 
@@ -70,12 +63,12 @@ Fallback planning rubric used for candidate selection:
 
 | Requirement | Source status | Planned satisfaction | Confirmed |
 |---|---|---|---|
-| Whitelisted DoraHacks email | Eventbrite | Verify account can open final submission | No |
-| GitHub repository | Secondary summary | Public repository with reproducible setup | No |
-| MVP places real perp orders on Tokyo testnet | Secondary summary | Small ETH-PERP or BTC-PERP live run | No |
-| README describes product and functionality | Secondary summary | Root README | Drafted |
-| Link to posts about MVP | Secondary summary | Prepare X post; publish only with approval | No |
-| Submission by Nov 1 23:59 UTC | Secondary summary | Internal Oct 31 target | Unconfirmed |
+| Whitelisted DoraHacks email | Eventbrite | Owner reports whitelist access on October 27; verify final submission form | Owner-confirmed; final form not independently checked |
+| GitHub repository | Official | Public repository with reproducible setup | No remote configured in this checkout |
+| MVP places real perp orders on Tokyo testnet | Official | Owner-confirmed ETH-PERP open and close; chain evidence in evidence/ | Yes for the recorded testnet example |
+| README describes product and functionality | Official | Root README | Drafted |
+| Two or three X posts tagging @DreamDEXSomnia, linked in README | Official | Drafts prepared; publication pending | No |
+| Submission by Nov 1 23:59 UTC | Official | Internal Oct 31 target | Deadline confirmed |
 | Demo video | Unknown | Prepare a sub-three-minute demo as a safe default | Unconfirmed |
 | Public deployment | Unknown | Plan deployment only after local verification and owner approval | Unconfirmed |
 
@@ -88,7 +81,7 @@ Accessible public build:
 - Strength: exact upstream commit, reproducible tests, measured before/after behavior, candidate patch, and honest limits.
 - Lesson: evidence quality matters more than visual polish alone.
 
-Other public MVP submissions were not discoverable through indexed sources on October 23. This does not mean none exist.
+The organizer has set the DoraHacks builds list to private. We cannot compare or rank the MVP field from that list.
 
 ## Candidate directions
 
@@ -104,11 +97,8 @@ Other public MVP submissions were not discoverable through indexed sources on Oc
 
 ## Unknowns requiring manual confirmation
 
-- Exact submission deadline and timezone.
-- Exact prize split.
 - Team-size rules.
 - Demo video requirement and length.
 - Public deployment requirement.
 - Whether pre-existing Downrail branding/code must be disclosed.
-- Whether an X post must exist before submission or can follow it.
 
