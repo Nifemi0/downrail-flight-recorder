@@ -28,7 +28,7 @@
 - [ ] MIT or event-compatible license confirmed.
 - [ ] `.env.example` contains names only, no secrets.
 - [x] README opens with thesis, local status, and proof.
-- [ ] Setup works from a fresh clone.
+- [x] Fresh public clone of app commit 47de832 passed npm ci, tests, typecheck, and build on October 27, 2026.
 - [x] Tests pass and exact count is recorded.
 - [ ] Secret scan passes.
 - [ ] Evidence artifacts are redacted.

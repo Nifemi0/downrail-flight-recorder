@@ -18,8 +18,8 @@ Last updated: October 27, 2026
 | Browser tests | Partial | October 26 local browser checks covered invalid and populated wallet lookup, older records, an inline chain check and a simulated RPC error; 390 × 844 mobile layout had no horizontal overflow. Owner-signed funded-wallet open and close were tested; additional order scenarios remain untested |
 | Typecheck | Yes | `npm run typecheck` passed on October 27, 2026 |
 | Production build | Yes | `npm run build` passed in the working directory on October 27, 2026; a separate local copy passed `npm ci` and build on October 26 |
-| Fresh-clone verification | No | Not run |
-| Public repository | Yes | https://github.com/Nifemi0/downrail-flight-recorder; clean-clone install and build verification in progress |
+| Fresh-clone verification | Yes | Public GitHub clone of app commit 47de832: npm ci, 24 tests, typecheck, and production build passed on October 27, 2026 |
+| Public repository | Yes | https://github.com/Nifemi0/downrail-flight-recorder; clean-clone verification passed for app commit 47de832 |
 | Production deployment | No | Not deployed |
 | External playtesters | No | None |
 | Submission accepted | No | Not submitted |

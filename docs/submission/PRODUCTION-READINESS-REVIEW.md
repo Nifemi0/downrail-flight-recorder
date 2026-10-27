@@ -12,7 +12,7 @@ Reviewed October 27, 2026. This is a local testnet MVP assessment, not an indepe
 
 ## Outstanding before hackathon submission
 
-- Repository created at https://github.com/Nifemi0/downrail-flight-recorder. A limited pattern scan found no matches; clean-clone installation and build verification are in progress. Complete a comprehensive secret scan before submission.
+- Repository created at https://github.com/Nifemi0/downrail-flight-recorder. A limited pattern scan found no matches; clean-clone npm ci, 24 tests, typecheck, and build passed for app commit 47de832. Complete a comprehensive secret scan before submission.
 - Publish the required X posts and link them in the README. Current posts are drafts.
 - Finish a demonstrative video after the owner finishes testing, and verify whether a public URL and video are mandatory on the submission form.
 - Update the README and submission description to include the current analytics feature and accurately describe limitations.

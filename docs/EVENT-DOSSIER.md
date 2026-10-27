@@ -64,7 +64,7 @@ Fallback planning rubric used for candidate selection:
 | Requirement | Source status | Planned satisfaction | Confirmed |
 |---|---|---|---|
 | Whitelisted DoraHacks email | Eventbrite | Owner reports whitelist access on October 27; verify final submission form | Owner-confirmed; final form not independently checked |
-| GitHub repository | Official | Public repository; clean-clone verification in progress | https://github.com/Nifemi0/downrail-flight-recorder |
+| GitHub repository | Official | Public repository; clean-clone verification passed for app commit 47de832 | https://github.com/Nifemi0/downrail-flight-recorder |
 | MVP places real perp orders on Tokyo testnet | Official | Owner-confirmed ETH-PERP open and close; chain evidence in evidence/ | Yes for the recorded testnet example |
 | README describes product and functionality | Official | Root README | Drafted |
 | Two or three X posts tagging @DreamDEXSomnia, linked in README | Official | Drafts prepared; publication pending | No |
