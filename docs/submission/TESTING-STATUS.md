@@ -19,7 +19,7 @@ Last updated: October 27, 2026
 | Typecheck | Yes | `npm run typecheck` passed on October 27, 2026 |
 | Production build | Yes | `npm run build` passed in the working directory on October 27, 2026; a separate local copy passed `npm ci` and build on October 26 |
 | Fresh-clone verification | No | Not run |
-| Public repository | No | Local planning files only |
+| Public repository | Yes | https://github.com/Nifemi0/downrail-flight-recorder; clean-clone install and build verification in progress |
 | Production deployment | No | Not deployed |
 | External playtesters | No | None |
 | Submission accepted | No | Not submitted |

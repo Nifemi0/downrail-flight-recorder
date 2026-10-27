@@ -12,7 +12,7 @@ Reviewed October 27, 2026. This is a local testnet MVP assessment, not an indepe
 
 ## Outstanding before hackathon submission
 
-- Prepare the actual GitHub repository with all intended files; no Git remote is configured in this checkout. Inspect changes, run a secret scan and reproduce installation and build from a fresh checkout.
+- Repository created at https://github.com/Nifemi0/downrail-flight-recorder. A limited pattern scan found no matches; clean-clone installation and build verification are in progress. Complete a comprehensive secret scan before submission.
 - Publish the required X posts and link them in the README. Current posts are drafts.
 - Finish a demonstrative video after the owner finishes testing, and verify whether a public URL and video are mandatory on the submission form.
 - Update the README and submission description to include the current analytics feature and accurately describe limitations.
@@ -26,4 +26,4 @@ Reviewed October 27, 2026. This is a local testnet MVP assessment, not an indepe
 - Load, rate limiting, monitoring, resilience to dependency failures, independent security review, accessibility and current mobile browser flow have not been verified to production standards. Public API routes depend on third-party services.
 - No comprehensive secret scanner was available during this check; absence of a few searched patterns does not establish the repository is free of secrets. Review tracked and untracked files before publishing.
 
-No new transaction was sent for this review. No deployment, post, video publication, or hackathon submission was performed.
+No new transaction was sent for this review. The repository was subsequently published. No deployment, post, video publication, or hackathon submission was performed.

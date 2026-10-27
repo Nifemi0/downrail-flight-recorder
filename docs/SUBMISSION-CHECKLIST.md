@@ -17,19 +17,19 @@
 - [x] Place a real supported testnet perp order.
 - [x] Capture opening transaction, order, fill, and position evidence: `evidence/owner-testnet-open.json`.
 - [x] Close the position in the owner-controlled testnet example; capture `evidence/owner-testnet-close.json`.
-- [ ] Generate the explainable receipt.
+- [x] Generate the explainable receipt from the recorded testnet lifecycle.
 - [ ] Verify every receipt row against evidence.
 - [ ] Verify error and unavailable-data states.
 - [ ] Verify mobile and desktop layouts.
 
 ## Repository
 
-- [ ] Public GitHub repository.
+- [x] Public GitHub repository: https://github.com/Nifemi0/downrail-flight-recorder.
 - [ ] MIT or event-compatible license confirmed.
 - [ ] `.env.example` contains names only, no secrets.
-- [ ] README opens with thesis, live status, and proof.
+- [x] README opens with thesis, local status, and proof.
 - [ ] Setup works from a fresh clone.
-- [ ] Tests pass and exact count is recorded.
+- [x] Tests pass and exact count is recorded.
 - [ ] Secret scan passes.
 - [ ] Evidence artifacts are redacted.
 
