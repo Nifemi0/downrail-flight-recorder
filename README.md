@@ -2,6 +2,10 @@
 
 > Every leveraged trade should explain itself.
 
+Live testnet app: [filltrail-dreamdex.vercel.app](https://filltrail-dreamdex.vercel.app/)
+
+The live deployment was built from a local working tree and includes changes not yet published in this repository.
+
 Downrail Flight Recorder is a testnet account activity viewer for dreamDEX Perps with an optional wallet-signed limit order flow. It pages through the official testnet indexer's supported account records, shows their sources, and lets a reader check a transaction hash separately against the Somnia chain RPC.
 
 ## Current status
