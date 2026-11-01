@@ -24,7 +24,7 @@ Last updated: November 1, 2026
 | Production build | Yes | `npm run build` passed in the working directory on October 31, 2026; a separate local copy passed `npm ci` and build on October 26 |
 | Production dependency audit | Yes | `npm audit --omit=dev` reported zero known vulnerabilities on October 31; this is not a security audit and excludes development and separate demo dependencies |
 | Limited secret-pattern scan | Partial | On October 31, a local scan of 90 non-ignored tracked and untracked paths found no private-key blocks, common GitHub tokens, AWS access keys or quoted mnemonic/private-key assignments. This is not a comprehensive secret scan; ignored files and other secret formats were excluded. |
-| Fresh-clone verification | Yes | Public GitHub clone of app commit 47de832: npm ci, 24 tests, typecheck, and production build passed on October 27, 2026 |
+| Fresh-clone verification | Yes | Clean checkout of the source subsequently published as commit 2c6b0c0: npm ci, 57 tests, typecheck, and production build passed on November 1, 2026. |
 | Public repository | Yes | https://github.com/Nifemi0/downrail-flight-recorder; clean-clone verification passed for app commit 47de832 |
 | Production deployment | Yes | https://filltrail-dreamdex.vercel.app/; deployed November 1, 2026. Market API, existing-wallet lookup and one transaction receipt check verified on the deployed app. |
 | External playtesters | No | None |

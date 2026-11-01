@@ -3,7 +3,7 @@
 ## Eligibility and rules
 
 - [x] DoraHacks whitelist access confirmed by the owner on October 27, 2026; final submission access not independently verified.
-- [x] Confirm exact deadline and timezone on the official event page: November 1, 23:59 UTC.
+- [ ] Confirm conflicting deadlines: on November 1 the event header showed an extension to November 15, 14:30 UTC (15:30 Lagos), while the written timeline still said November 1, 23:59 UTC (November 2, 00:59 Lagos). Treat the earlier deadline as operative until organizers clarify.
 - [ ] Confirm team size and participant eligibility.
 - [x] Confirm MVP prize split and judging criteria: $300 initially and $200 conditional on a mainnet order; potential, building evidence and communication.
 - [ ] Confirm whether a public deployment is mandatory.
