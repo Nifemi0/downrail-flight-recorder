@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fundingReviewWithinBounds, withMarginBuffer } from "./order-review";
+import { allowanceWithinReviewed, fundingReviewWithinBounds, withMarginBuffer } from "./order-review";
 
 describe("wallet funding review", () => {
   const reviewed = { lockAmount: 5n, ownWalletPull: 3n, mainWalletPull: 2n, fundingPayer: "0xABC" };
@@ -11,6 +11,11 @@ describe("wallet funding review", () => {
   });
   it("requires a fresh review when the linked payer changes", () => {
     expect(fundingReviewWithinBounds(reviewed, { ...reviewed, fundingPayer: "0xdef" })).toBe(false);
+  });
+  it("rejects increased or unavailable allowance while allowing a smaller allowance", () => {
+    expect(allowanceWithinReviewed(10n, 11n)).toBe(false);
+    expect(allowanceWithinReviewed(10n, null)).toBe(false);
+    expect(allowanceWithinReviewed(10n, 9n)).toBe(true);
   });
   it("allows changes inside the displayed buffer and prevents a new linked-wallet pull", () => {
     expect(fundingReviewWithinBounds(reviewed, { ...reviewed, lockAmount: withMarginBuffer(reviewed.lockAmount) })).toBe(true);

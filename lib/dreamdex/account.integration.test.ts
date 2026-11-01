@@ -4,7 +4,7 @@ const { client, markets } = vi.hoisted(() => ({
   client: {
     listPerpPositions: vi.fn(), getPerpPortfolio: vi.fn(), listPerpOrderHistory: vi.fn(),
     getUserFillsPage: vi.fn(), listPerpPositionChanges: vi.fn(), getFundingPayments: vi.fn(),
-    getMarginEvents: vi.fn(), listLiquidations: vi.fn(),
+    getMarginEvents: vi.fn(), listPerpFees: vi.fn(), listLiquidations: vi.fn(),
   },
   markets: { supported: [{ symbol: "ETH-PERP", poolAddress: "0x1111111111111111111111111111111111111111", baseDecimals: 18, quoteDecimals: 18 }] },
 }));
@@ -26,6 +26,7 @@ beforeEach(() => {
   client.getUserFillsPage.mockResolvedValue({ fills: [], nextCursor: null });
   client.listPerpPositionChanges.mockImplementation(async ({ offset }: { offset: number }) => changes.slice(offset, offset + 51));
   client.getFundingPayments.mockResolvedValue([]);
+  client.listPerpFees.mockResolvedValue([]);
   client.getMarginEvents.mockResolvedValue([]);
   client.listLiquidations.mockResolvedValue([]);
 });
@@ -46,6 +47,26 @@ describe("account source pagination", () => {
     const result = await getAccountRecorderSnapshot(wallet);
     expect(result.sourceStatus.funding.state).toBe("unavailable");
     expect(result.positionChanges).toHaveLength(50);
+    expect(result.nextCursor).toBeNull();
+  });
+
+  it("reads fee and rebate rows with protocol units and leaves account-wide charges unattributed", async () => {
+    client.listPerpPositionChanges.mockResolvedValue([]);
+    client.listPerpFees.mockResolvedValue([
+      { id: "fee", pool: markets.supported[0].poolAddress, kind: "Fee", amount: "1250000000000000000", isRebate: false, timestamp: "3", txHash: "0xfee" },
+      { id: "rebate", pool: markets.supported[0].poolAddress, kind: "Rebate", amount: "500000000000000000", isRebate: true, timestamp: "4", txHash: "0xrebate" },
+      { id: "account-fee", pool: null, kind: "BuilderFee", amount: "1", isRebate: false, timestamp: "5", txHash: "0xother" },
+    ]);
+    const result = await getAccountRecorderSnapshot(wallet);
+    expect(result.fees).toMatchObject([{id:"fee",amount:"1.25",isRebate:false}, {id:"rebate",amount:"0.5",isRebate:true}]);
+    expect(result.sourceStatus.fees.detail).toContain("account-wide or other fee kinds are not attributed");
+  });
+
+  it("reports a failed fee source and stops pagination instead of claiming complete costs", async () => {
+    client.listPerpFees.mockRejectedValue(new Error("fees unavailable"));
+    const result = await getAccountRecorderSnapshot(wallet);
+    expect(result.sourceStatus.fees.state).toBe("unavailable");
+    expect(result.fees).toEqual([]);
     expect(result.nextCursor).toBeNull();
   });
 

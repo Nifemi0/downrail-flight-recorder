@@ -2,9 +2,9 @@
 
 ## Working name
 
-**Downrail Flight Recorder**
+**Filltrail** (formerly Downrail Flight Recorder)
 
-The name is provisional until the first working testnet receipt exists. Product mechanics are locked before visual naming work.
+The name was selected after the first working testnet receipt. Product mechanics remain unchanged.
 
 ## Thesis
 
@@ -16,7 +16,7 @@ Perp interfaces usually reduce a position to entry, leverage, liquidation price,
 
 ## Product
 
-Downrail turns a real dreamDEX perp position into a chronological, verifiable explanation. It records the position lifecycle and produces a receipt whose statements link back to dreamDEX testnet data and transaction hashes.
+Filltrail turns observed dreamDEX perp records into a chronological explanation. Its receipt links available statements to testnet data and transaction hashes; history and net PnL may be incomplete.
 
 ## Primary user
 

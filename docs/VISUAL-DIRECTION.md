@@ -1,8 +1,8 @@
-# Downrail visual direction: Precision Ledger
+# Filltrail visual direction: Precision Ledger
 
 ## Product perception
 
-Downrail should feel understandable, credible, active, and polished. It is a position-intelligence product for dreamDEX Perps—not a cyberpunk terminal, insurance storefront, or generic crypto dashboard.
+Filltrail should feel understandable, credible, active, and polished. It is a position-intelligence product for dreamDEX Perps—not a cyberpunk terminal, insurance storefront, or generic crypto dashboard.
 
 ## Directions considered
 
@@ -68,6 +68,6 @@ The landing page must answer these questions in order:
 
 1. What is it? A readable trade record for dreamDEX perpetual positions.
 2. What does the user provide? A public testnet wallet address.
-3. What does Downrail do? It joins supported order, fill, funding, and position-change events chronologically.
+3. What does Filltrail do? It joins supported order, fill, funding, and position-change events chronologically.
 4. What does the user receive? A readable position record with the available source behind each claim.
-5. What does it not do? It does not take custody, request a private key, move funds, or sign from the current interface.
+5. What does it not do? It does not take custody or request a private key. The optional testnet order flow can request a wallet signature; it is separate from read-only lookups.

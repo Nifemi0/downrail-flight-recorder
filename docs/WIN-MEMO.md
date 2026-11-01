@@ -2,7 +2,7 @@
 
 ## Product
 
-**Downrail Flight Recorder** — a verifiable black box for dreamDEX perp positions.
+**Filltrail** — a verifiable black box for dreamDEX perp positions.
 
 > Every leveraged trade should explain itself.
 
@@ -16,7 +16,7 @@
 
 ## Edge
 
-Most trading tools focus on what to trade or when to trade. Downrail focuses on explaining what actually happened. The receipt makes dreamDEX's onchain transparency useful to people who do not read contract events.
+Most trading tools focus on what to trade or when to trade. Filltrail focuses on explaining what actually happened. The receipt makes dreamDEX's onchain transparency useful to people who do not read contract events.
 
 ## Risks
 

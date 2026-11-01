@@ -8,8 +8,8 @@ const change = (id: string, kind: AccountPositionChange["kind"], block: string, 
 });
 const snapshot = (changes: AccountPositionChange[]): AccountRecorderSnapshot => ({
   account: "0x0000000000000000000000000000000000000001", chainId: 50383, checkedAt: "2026-10-26T00:00:00Z",
-  positions: [], openOrders: [], orderHistory: [], fills: [], positionChanges: changes, funding: [], marginEvents: [], liquidations: [], page: 1, nextCursor: null,
-  sourceStatus: Object.fromEntries(["positions", "openOrders", "orderHistory", "fills", "positionChanges", "funding", "marginEvents", "liquidations"].map((name) => [name, { state: "indexed", detail: "", hasMore: false }])) as AccountRecorderSnapshot["sourceStatus"],
+  positions: [], openOrders: [], orderHistory: [], fills: [], positionChanges: changes, funding: [], fees: [], marginEvents: [], liquidations: [], page: 1, nextCursor: null,
+  sourceStatus: Object.fromEntries(["positions", "openOrders", "orderHistory", "fills", "positionChanges", "funding", "fees", "marginEvents", "liquidations"].map((name) => [name, { state: "indexed", detail: "", hasMore: false }])) as AccountRecorderSnapshot["sourceStatus"],
 });
 
 describe("position receipts", () => {

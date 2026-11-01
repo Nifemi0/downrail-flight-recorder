@@ -443,3 +443,19 @@ footer { padding: 54px max(24px, calc((100vw - 1320px)/2)); display: grid; grid-
   .chart-cursor, .waiting-badge i { animation: none; }
   .primary-action, .mechanic-stream article { transition: none; }
 }
+
+.availability-page { max-width: 900px; margin: 0 auto; padding: clamp(72px, 12vw, 150px) 24px; }
+.availability-page h1 { max-width: 720px; margin: 18px 0; font-size: clamp(2.5rem, 7vw, 5rem); line-height: 1.04; letter-spacing: -.05em; }
+.availability-page p { max-width: 580px; line-height: 1.6; }
+.availability-retry { display: inline-flex; align-items: center; gap: 22px; margin-top: 20px; padding: 14px 20px; background: var(--ink); color: white; border-radius: 8px; text-decoration: none; }
+.availability-note { margin-top: 28px; color: var(--muted); font-size: .9rem; }
+.archive-viewer { margin: 20px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; overflow-wrap: anywhere; }
+.archive-viewer summary { cursor: pointer; font-weight: 700; }
+.archive-viewer p, .archive-viewer li { font-size: .88rem; line-height: 1.6; }
+.archive-viewer input { display: block; max-width: 100%; margin-top: 8px; }
+.archive-events { max-height: 28rem; overflow: auto; padding-left: 22px; }
+.archive-events li { margin: 12px 0; }
+.archive-scan { margin: 18px 0; padding: 16px; background: var(--surface, #f5f6f4); border-radius: 8px; }
+.archive-scan label { display: inline-block; margin: 0 14px 12px 0; }
+.archive-scan input { width: 10rem; padding: 8px; }
+.archive-scan button { padding: 9px 12px; cursor: pointer; }

@@ -13,3 +13,7 @@ export function fundingReviewWithinBounds(reviewed: FundingReview, current: Fund
   return current.lockAmount <= withMarginBuffer(reviewed.lockAmount) && current.ownWalletPull <= withMarginBuffer(reviewed.ownWalletPull) &&
     current.mainWalletPull <= withMarginBuffer(reviewed.mainWalletPull) && reviewed.fundingPayer?.toLowerCase() === current.fundingPayer?.toLowerCase();
 }
+
+export function allowanceWithinReviewed(reviewed: bigint, current: bigint | null): boolean {
+  return current !== null && current <= reviewed;
+}

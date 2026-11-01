@@ -2,7 +2,7 @@
 
 ## Internal target
 
-Submission-ready by **October 31, 2026**, leaving a buffer before the earliest reported deadline of November 1 at 23:59 UTC.
+Aim for submission readiness promptly. On October 31, DoraHacks displayed an extension to November 15 at 14:30 UTC, although its original description still stated November 1 at 23:59 UTC. Recheck the live page before submitting.
 
 ## Build order
 

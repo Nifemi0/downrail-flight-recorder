@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Downrail Flight Recorder",
-  description: "A verifiable flight recorder for dreamDEX Perps positions.",
+  title: "Filltrail — Every trade leaves a trail",
+  description: "Explore the records behind dreamDEX Perps positions on testnet.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

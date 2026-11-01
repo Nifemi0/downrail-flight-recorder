@@ -1,6 +1,6 @@
 # Event Dossier — dreamDEX Perps Builder Bounty
 
-> Official DoraHacks details checked October 26, 2026. The organizer has made the public builds list private.
+> Official DoraHacks details and the displayed extension checked October 31, 2026. Earlier organizer notes said the public builds list was private; check its current visibility separately.
 
 ## Event facts
 
@@ -8,7 +8,7 @@
 - **Format:** online builder bounty focused on dreamDEX Perps.
 - **Public event listing:** https://www.eventbrite.com/e/dreamdex-perps-builder-bounty-tickets-2003605109819
 - **Official submission page:** https://dorahacks.io/hackathon/dreamdex-perps-bounty/detail
-- **Deadline:** November 1, 2026 at 23:59 UTC, confirmed on DoraHacks (November 2 at 00:59 Lagos time).
+- **Deadline:** On October 31, DoraHacks displayed an extension to November 15, 2026 at 14:30 UTC (15:30 Lagos). Its descriptive timeline still said November 1 at 23:59 UTC. Recheck the live event page before submitting.
 - **Internal target:** October 31, 2026.
 - **Eligibility:** registration is open, but submission requires a whitelisted email. Selected builders from the prior dreamDEX Event Contracts hackathon were invited.
 - **Team size:** unknown.
@@ -68,7 +68,7 @@ Fallback planning rubric used for candidate selection:
 | MVP places real perp orders on Tokyo testnet | Official | Owner-confirmed ETH-PERP open and close; chain evidence in evidence/ | Yes for the recorded testnet example |
 | README describes product and functionality | Official | Root README | Drafted |
 | Two or three X posts tagging @DreamDEXSomnia, linked in README | Official | Drafts prepared; publication pending | No |
-| Submission by Nov 1 23:59 UTC | Official | Internal Oct 31 target | Deadline confirmed |
+| Submission deadline | Official timeline displays Nov 15, 14:30 UTC extension | Original description still says Nov 1, 23:59 UTC | Recheck live page before submission |
 | Demo video | Unknown | Prepare a sub-three-minute demo as a safe default | Unconfirmed |
 | Public deployment | Unknown | Plan deployment only after local verification and owner approval | Unconfirmed |
 

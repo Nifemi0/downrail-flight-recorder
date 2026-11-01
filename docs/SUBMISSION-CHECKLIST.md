@@ -35,9 +35,9 @@
 
 ## Submission assets
 
-- [ ] Live URL prepared and tested if required.
+- [x] Live URL prepared: https://filltrail-dreamdex.vercel.app/. Market API, existing-wallet lookup, and a transaction check verified on November 1.
 - [ ] Demo video under three minutes prepared as a safe default.
-- [ ] Publish two or three accurate X posts and link them in the README; drafts exist locally.
+- [x] Publish two accurate X posts tagging @DreamDEXSomnia and link them in the README.
 - [ ] DoraHacks title, tagline, description, repo, demo, and team fields drafted.
 - [ ] Screenshot and social image reflect the actual product.
 - [ ] `CLAIMS.md` is current.

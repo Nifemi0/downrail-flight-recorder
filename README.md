@@ -1,18 +1,18 @@
-# Downrail Flight Recorder
+# Filltrail
 
 > Every leveraged trade should explain itself.
 
 Live testnet app: [filltrail-dreamdex.vercel.app](https://filltrail-dreamdex.vercel.app/)
 
-The live deployment was built from a local working tree and includes changes not yet published in this repository.
+The current app source is published in this repository. The deployment is updated separately from Git.
 
-Downrail Flight Recorder is a testnet account activity viewer for dreamDEX Perps with an optional wallet-signed limit order flow. It pages through the official testnet indexer's supported account records, shows their sources, and lets a reader check a transaction hash separately against the Somnia chain RPC.
+Filltrail is a testnet account activity viewer for dreamDEX Perps with an optional wallet-signed limit order flow. It pages through the official testnet indexer's supported account records, shows their sources, and lets a reader check a transaction hash separately against the Somnia chain RPC. It was previously named Downrail Flight Recorder; the existing repository retains its original name.
 
 ## Current status
 
-**The local indexer viewer is live.** For a public wallet it reads supported positions, open orders, order history, fills, position changes, margin events, funding, and liquidation stages. A position receipt groups observed changes, links fills by market and transaction, links matching indexed orders by order ID, and can be exported as JSON. Older records can be loaded in pages. The app can check a transaction receipt through RPC and decode a supported fill's on-chain quantity and price for comparison. A separate block-pinned on-chain snapshot shows an open position’s mark-to-market price PnL and accrued funding when the mark is available. It does not independently verify wallet involvement or every indexed field.
+**The testnet viewer is live.** For a public wallet it reads supported positions, open orders, order history, fills, position changes, margin events, funding, and liquidation stages. A position receipt groups observed changes, links fills by market and transaction, links matching indexed orders by order ID, and can be exported as JSON. Older records can be loaded in pages. The app can check a transaction receipt through RPC and decode a supported fill's on-chain quantity and price for comparison. A separate block-pinned on-chain snapshot shows an open position’s mark-to-market price PnL and accrued funding when the mark is available. It does not independently verify wallet involvement or every indexed field.
 
-An owner-controlled wallet opened and closed a real ETH-PERP position through the local app on Hideki testnet. The buy of 0.004 ETH filled at 2308.49 paper USDso in transaction `0x15766748dfd03bd61d5e786f9d4ec9177f2c82763b401ad78ac5a2762453fe95`, block 34005026. The sell filled at 2306.86 in transaction `0xa17812dca463b120ceb1c1b51acbd2115a4892cd5eb91d9f46bb2cef24532721`, block 34007780. The indexer reported a flat position and -0.00652 USDso realized price PnL. The two RPC fill logs agree with the indexed prices and quantities; see [opening evidence](evidence/owner-testnet-open.json), [closing evidence](evidence/owner-testnet-close.json), and the [exported position receipt](evidence/owner-position-receipt.json). Funding, fees, and complete net PnL have not been reconciled.
+An owner-controlled wallet opened and closed a real ETH-PERP position through the local app on Hideki testnet. The buy of 0.004 ETH filled at 2308.49 paper USDso in transaction `0x15766748dfd03bd61d5e786f9d4ec9177f2c82763b401ad78ac5a2762453fe95`, block 34005026. The sell filled at 2306.86 in transaction `0xa17812dca463b120ceb1c1b51acbd2115a4892cd5eb91d9f46bb2cef24532721`, block 34007780. The indexer reported a flat position and -0.00652 USDso realized price PnL. The two RPC fill logs agree with the indexed prices and quantities; see [opening evidence](evidence/owner-testnet-open.json), [closing evidence](evidence/owner-testnet-close.json), and the [exported position receipt](evidence/owner-position-receipt.json). Matching indexed fee, rebate and funding events can be shown as an observed subtotal; incomplete or ambiguous records and gas are excluded, so complete net PnL has not been established.
 
 This is a client of dreamDEX's official indexer, **not a self-hosted independent chain indexer**. The official SDK currently caps the open-order response at 1,000, and newly indexed activity can shift older offset pages. Source errors and missing rows are shown rather than replaced with demo numbers.
 
@@ -37,8 +37,8 @@ To inspect existing data, select ETH-PERP or BTC-PERP and enter a public Hideki 
 ## What the MVP must prove
 
 1. A real ETH-PERP or BTC-PERP order is placed on the Somnia Tokyo/Hideki testnet.
-2. Downrail records the order and position lifecycle from dreamDEX data.
-3. Downrail produces an explainable receipt backed by transaction hashes and reproducible evidence.
+2. Filltrail records available order and position lifecycle data from dreamDEX.
+3. Filltrail produces a partial, explainable receipt with transaction hashes and reproducible evidence.
 
 ## Product surfaces
 
@@ -46,9 +46,10 @@ To inspect existing data, select ETH-PERP or BTC-PERP and enter a public Hideki 
 - `/api/markets` — current supported market snapshot.
 - `/api/accounts/[address]` — paged indexed account sources; pass the returned `nextCursor` as the `cursor` query parameter for older rows.
 - `/api/accounts/[address]/analytics?market=ETH-PERP` — block-pinned current position analytics when the mark is available.
+- `/api/accounts/[address]/chain-events` — bounded direct-chain checks for position, funding, fee and rebate events; not a full indexer.
 - `/api/transactions/[hash]` — read-only Somnia RPC transaction receipt check, distinct from indexer data.
 
-The next milestone is to reconcile the position's attributable records and make the evidence reproducible from a clean checkout.
+A local resumable direct-event archive covers selected position, funding, fee, rebate and order events. The app can view a saved file even when market discovery is down, or import it for comparison and a qualified subtotal. The editable file is not authenticated and does not replace the official indexer; see [local event archive](docs/LOCAL-EVENT-ARCHIVE.md). Transaction gas can be checked separately in STT, without treating it as position-specific USDso PnL. The exact on-chain collateral cap remains unverified; see [on-chain limit feasibility](docs/ONCHAIN-LIMIT-FEASIBILITY.md).
 
 ## X posts
 
@@ -61,7 +62,7 @@ Two posts tagging @DreamDEXSomnia:
 
 The optional order is a normal limit order, not reduce-only. A position may change before it fills, and the client-side margin preview is not an on-chain spending cap. This is a testnet MVP, not a production trading system.
 
-Downrail does not predict prices, promise profit, custody funds, sell insurance, or create a new perp protocol. It explains real activity on dreamDEX Perps.
+Filltrail does not predict prices, promise profit, custody funds, sell insurance, or create a new perp protocol. It explains observed activity on dreamDEX Perps.
 
 ## Documentation
 

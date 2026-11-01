@@ -1,10 +1,10 @@
-# Downrail Flight Recorder — demo narration draft
+# Filltrail — demo narration draft
 
 All figures below are from the owner-authorized Hideki testnet lifecycle saved under `evidence/`. Paper USDso is testnet collateral. The recording must show the actual app and evidence, not a staged transaction.
 
 **Opening**
 
-Every leveraged trade leaves a trail. But understanding what happened means piecing together orders, fills, position changes and funding. Downrail Flight Recorder brings those records into a readable position view.
+Every leveraged trade leaves a trail. But understanding what happened means piecing together orders, fills, position changes and funding. Filltrail brings those records into a readable position view.
 
 **Opening the position**
 

@@ -1,8 +1,8 @@
-# Flight Recorder — MVP submission draft
+# Filltrail — MVP submission draft
 
 ## Product
 
-Downrail Flight Recorder helps a dreamDEX Perps trader inspect the records behind a testnet position. A public wallet lookup brings together supported positions, orders, fills, position changes, margin, funding, and liquidation data returned by the official indexer. A position receipt groups observed changes and transaction-matched fills; a chain check can decode a supported fill's quantity and price.
+Filltrail helps a dreamDEX Perps trader inspect the records behind a testnet position. A public wallet lookup brings together supported positions, orders, fills, position changes, margin, funding, and liquidation data returned by the official indexer. A position receipt groups observed changes and transaction-matched fills; a chain check can decode a supported fill's quantity and price.
 
 ## Current evidence
 
@@ -17,11 +17,11 @@ Downrail Flight Recorder helps a dreamDEX Perps trader inspect the records behin
 ## Required before submission
 
 - Verify whitelist access in the intended DoraHacks account.
-- Reconcile the observable funding and fees or leave them explicitly unavailable; do not imply complete net PnL.
+- Preserve the existing uniquely matched fee and funding attribution and flag unmatched or unavailable costs; do not imply complete net PnL.
 - Capture position change and close evidence where available, and compare the exported receipt with source records.
 - Prepare a public repository with the current local files and reproducible instructions; verify from a clean checkout.
 - Record a demo of the real order and receipt.
 - Publish two or three accurate posts tagging @DreamDEXSomnia and link them from the README.
 - Review the final submission against the official requirements before submitting.
 
-Deadline: November 1, 2026, 23:59 UTC (November 2, 00:59 in Lagos). Submission and publication remain pending.
+On October 31, the official timeline displayed an extension to November 15, 2026, 14:30 UTC (15:30 in Lagos); the older description still stated November 1, 23:59 UTC. Recheck the live event page before submission. Submission and publication remain pending.

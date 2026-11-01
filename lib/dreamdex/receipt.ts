@@ -2,7 +2,7 @@ import type { AccountRecorderSnapshot } from "./account";
 
 export type ReceiptEvent = {
   id: string;
-  kind: "Order" | "Position change" | "Fill" | "Funding" | "Margin" | "Liquidation";
+  kind: "Order" | "Position change" | "Fill" | "Funding" | "Fee" | "Margin" | "Liquidation";
   market: string;
   timestamp: string;
   title: string;
@@ -66,6 +66,11 @@ export function buildReceiptEvents(snapshot: AccountRecorderSnapshot): ReceiptEv
     blockNumber: null,
     logIndex: null,
   }));
+  const fees: ReceiptEvent[] = snapshot.fees.map((fee) => ({
+    id: `fee-${fee.id}`, kind: "Fee", market: fee.market, timestamp: fee.timestamp,
+    title: fee.isRebate ? "Rebate received" : "Fee charged", detail: `Indexed ${fee.kind}: ${fee.amount} USDso`,
+    transactionHash: fee.transactionHash, blockNumber: null, logIndex: null,
+  }));
   const margin: ReceiptEvent[] = snapshot.marginEvents.map((movement) => ({
     id: `margin-${movement.id}`,
     kind: "Margin",
@@ -88,7 +93,7 @@ export function buildReceiptEvents(snapshot: AccountRecorderSnapshot): ReceiptEv
     blockNumber: event.blockNumber,
     logIndex: null,
   }));
-  return [...orders, ...changes, ...fills, ...funding, ...margin, ...liquidations].sort((a, b) => {
+  return [...orders, ...changes, ...fills, ...funding, ...fees, ...margin, ...liquidations].sort((a, b) => {
     const aTime = eventTime(a.timestamp);
     const bTime = eventTime(b.timestamp);
     if (!Number.isFinite(aTime)) return 1;

@@ -7,7 +7,8 @@ import { SOMNIA_HIDEKI_TESTNET_ADDRESSES } from "@somnia-chain/markets-sdk";
 
 import { createDreamDexClient, DREAMDEX_CHAIN } from "@/lib/dreamdex/config";
 import type { SupportedPerpMarket } from "@/lib/dreamdex/markets";
-import { fundingReviewWithinBounds, withMarginBuffer } from "@/lib/dreamdex/order-review";
+import { orderCalldataMatches } from "@/lib/dreamdex/order-calldata";
+import { allowanceWithinReviewed, fundingReviewWithinBounds, withMarginBuffer } from "@/lib/dreamdex/order-review";
 import { shortenAddress } from "@/lib/format";
 
 type PreparedOrder = {
@@ -22,6 +23,8 @@ type PreparedOrder = {
   ownWalletPull: bigint;
   mainWalletPull: bigint;
   fundingPayer: Address | null;
+  walletAllowance: bigint;
+  reviewedAtMs: number;
 };
 
 function injectedProvider(): EIP1193Provider {
@@ -103,7 +106,8 @@ export function TradeReview({ market, onConfirmed }: { market: SupportedPerpMark
         }
         throw new Error(explainMarginFailure(margin, market));
       }
-      setPrepared({ account, market, isBid: side === "long", quantity: rawQuantity, price: rawPrice, limitNotional: notional, lockAmount: margin.lockAmount, asOfBlock: margin.asOfBlock, ownWalletPull: margin.ownWalletPull, mainWalletPull: margin.mainWalletPull, fundingPayer: margin.fundingPayer });
+      if (!margin.wallet) throw new Error("Wallet allowance could not be verified. Try the review again.");
+      setPrepared({ account, market, isBid: side === "long", quantity: rawQuantity, price: rawPrice, limitNotional: notional, lockAmount: margin.lockAmount, asOfBlock: margin.asOfBlock, ownWalletPull: margin.ownWalletPull, mainWalletPull: margin.mainWalletPull, fundingPayer: margin.fundingPayer, walletAllowance: margin.wallet.allowance, reviewedAtMs: Date.now() });
     } catch (cause) { setError(cause instanceof Error ? cause.message : "Order review failed."); }
     finally { setBusy(false); }
   }
@@ -138,6 +142,7 @@ export function TradeReview({ market, onConfirmed }: { market: SupportedPerpMark
     if (!prepared) return;
     setBusy(true); setError(null);
     try {
+      if (Date.now() - prepared.reviewedAtMs > 60_000) throw new Error("The review expired. Review the order again before signing.");
       const provider = injectedProvider();
       const wallet = walletFor(provider, prepared.account);
       const activeAccounts = await wallet.getAddresses();
@@ -146,10 +151,12 @@ export function TradeReview({ market, onConfirmed }: { market: SupportedPerpMark
       const exchange = createDreamDexClient();
       const margin = await exchange.client.previewPerpOrderMargin({ pool: prepared.market.poolAddress, marginBank: prepared.market.marginBank, account: prepared.account, isBid: prepared.isBid, quantity: prepared.quantity, price: prepared.price, autoPull: true });
       if (!margin.priceable || !margin.sufficient) throw new Error("Margin or market state changed. Review the order again.");
+      if (!allowanceWithinReviewed(prepared.walletAllowance, margin.wallet?.allowance ?? null)) throw new Error("Wallet allowance increased or could not be verified. Review the order again.");
       if (!fundingReviewWithinBounds(prepared, margin)) throw new Error("The margin or wallet funding amounts exceeded the reviewed maximum. Review the order again before signing.");
       const trader = exchange.client.createTrader({ walletClient: wallet });
-      const unsigned = await trader.buildPlacePerpOrder({ pool: prepared.market.poolAddress, isBid: prepared.isBid, quantity: prepared.quantity, price: prepared.price, orderType: 0, expireTimestampNs: BigInt(Date.now() + 10 * 60_000) * 1_000_000n });
-      if (unsigned.approval || unsigned.order.chainId !== DREAMDEX_CHAIN.id || unsigned.order.to.toLowerCase() !== prepared.market.poolAddress.toLowerCase()) throw new Error("Built order did not match the reviewed testnet market.");
+      const expiresNs = BigInt(Date.now() + 10 * 60_000) * 1_000_000n;
+      const unsigned = await trader.buildPlacePerpOrder({ pool: prepared.market.poolAddress, isBid: prepared.isBid, quantity: prepared.quantity, price: prepared.price, orderType: 0, expireTimestampNs: expiresNs });
+      if (Date.now() - prepared.reviewedAtMs > 60_000 || unsigned.approval || unsigned.order.chainId !== DREAMDEX_CHAIN.id || unsigned.order.to.toLowerCase() !== prepared.market.poolAddress.toLowerCase() || (unsigned.order.value ?? 0n) !== 0n || !orderCalldataMatches(unsigned.order.data, { isBid: prepared.isBid, price: prepared.price, quantity: prepared.quantity, expiresNs })) throw new Error("Built order did not match the reviewed testnet market.");
       const hash = await wallet.sendTransaction({ account: prepared.account, chain: DREAMDEX_CHAIN, to: unsigned.order.to, data: unsigned.order.data, value: unsigned.order.value });
       setResult({ hash, block: 0n, status: "Submitted; awaiting chain receipt" });
       const publicClient = createPublicClient({ chain: DREAMDEX_CHAIN, transport: http() });
@@ -164,7 +171,7 @@ export function TradeReview({ market, onConfirmed }: { market: SupportedPerpMark
   return <section className="trade-review" aria-label="Testnet order review">
     <div className="trade-review-heading"><div><p className="panel-label">Optional testnet order</p><h4>Make a real event to record.</h4><p>This is a small, expiring limit order—not a simulated fill. It can execute, remain open, or expire. Margin and gas are testnet assets.</p></div><button type="button" onClick={connect} disabled={busy}>{account ? shortenAddress(account) : "Connect wallet"}</button></div>
     <div className="trade-fields"><label>Direction<select disabled={busy} value={side} onChange={event => { setSide(event.target.value as "long" | "short"); clearReview(); }}><option value="long">Buy / long</option><option value="short">Sell / short</option></select></label><label>Quantity ({market.baseSymbol})<input disabled={busy} inputMode="decimal" value={quantity} onChange={event => { setQuantity(event.target.value); clearReview(); }} placeholder={formatUnits(BigInt(market.minQuantity), market.baseDecimals)} /></label><label>Limit price ({market.quoteSymbol})<input disabled={busy} inputMode="decimal" value={limitPrice} onChange={event => { setLimitPrice(event.target.value); clearReview(); }} placeholder={market.lastPrice ? formatUnits(BigInt(market.lastPrice), market.quoteDecimals) : "Enter price"} /></label><button type="button" onClick={review} disabled={busy || !account}>Review order</button></div>
-    {prepared ? <div className="trade-confirm"><p><strong>{prepared.isBid ? "Buy" : "Sell"} {formatUnits(prepared.quantity, market.baseDecimals)} {market.baseSymbol}</strong> at a limit of {formatUnits(prepared.price, market.quoteDecimals)} {market.quoteSymbol}. Maximum limit notional: {formatUnits(prepared.limitNotional, market.quoteDecimals)} {market.quoteSymbol}. Margin lock: {formatUnits(prepared.lockAmount, market.quoteDecimals)} {market.quoteSymbol} at block {prepared.asOfBlock.toString()}; maximum accepted before opening the wallet: {formatUnits(withMarginBuffer(prepared.lockAmount), market.quoteDecimals)} {market.quoteSymbol}.</p><p>Potential top-up from your wallet: {formatUnits(prepared.ownWalletPull, market.quoteDecimals)} {market.quoteSymbol}; maximum accepted before opening the wallet: {formatUnits(withMarginBuffer(prepared.ownWalletPull), market.quoteDecimals)} {market.quoteSymbol}{prepared.mainWalletPull > 0n ? `. Linked wallet ${prepared.fundingPayer ?? "unknown"}: ${formatUnits(prepared.mainWalletPull, market.quoteDecimals)} ${market.quoteSymbol}, maximum ${formatUnits(withMarginBuffer(prepared.mainWalletPull), market.quoteDecimals)}` : "; no linked-wallet top-up is accepted in this review"}. These are testnet assets.</p><p>Market conditions may change after your wallet opens. These preview limits are checked before signing and are not enforced as on-chain caps. A resting order can fill before its 10-minute expiry. This is not a reduce-only order: if your position changes before it fills, a sell or buy intended to close it could instead increase or reverse your position.</p><button type="button" onClick={submit} disabled={busy}>{busy ? "Working…" : "Send testnet order in wallet"}</button></div> : null}
+    {prepared ? <div className="trade-confirm"><p><strong>{prepared.isBid ? "Buy" : "Sell"} {formatUnits(prepared.quantity, market.baseDecimals)} {market.baseSymbol}</strong> at a limit of {formatUnits(prepared.price, market.quoteDecimals)} {market.quoteSymbol}. Maximum limit notional: {formatUnits(prepared.limitNotional, market.quoteDecimals)} {market.quoteSymbol}. Margin lock: {formatUnits(prepared.lockAmount, market.quoteDecimals)} {market.quoteSymbol} at block {prepared.asOfBlock.toString()}; maximum accepted before opening the wallet: {formatUnits(withMarginBuffer(prepared.lockAmount), market.quoteDecimals)} {market.quoteSymbol}.</p><p>Potential top-up from your wallet: {formatUnits(prepared.ownWalletPull, market.quoteDecimals)} {market.quoteSymbol}; maximum accepted before opening the wallet: {formatUnits(withMarginBuffer(prepared.ownWalletPull), market.quoteDecimals)} {market.quoteSymbol}{prepared.mainWalletPull > 0n ? `. Linked wallet ${prepared.fundingPayer ?? "unknown"}: ${formatUnits(prepared.mainWalletPull, market.quoteDecimals)} ${market.quoteSymbol}, maximum ${formatUnits(withMarginBuffer(prepared.mainWalletPull), market.quoteDecimals)}` : "; no linked-wallet top-up is accepted in this review"}. These are testnet assets.</p><p>Current wallet allowance to MarginBank: {formatUnits(prepared.walletAllowance, market.quoteDecimals)} {market.quoteSymbol}. This is the existing total allowance, not a per-order limit; any unused allowance remains until spent or revoked.</p><p>This review expires after 60 seconds. Market conditions may change after your wallet opens. These preview limits are checked before signing and are not enforced as on-chain caps. A resting order can fill before its 10-minute expiry. This is not a reduce-only order: if your position changes before it fills, a sell or buy intended to close it could instead increase or reverse your position.</p><button type="button" onClick={submit} disabled={busy}>{busy ? "Working…" : "Send testnet order in wallet"}</button></div> : null}
     {approval ? <div className="trade-confirm"><p><strong>Limited testnet token allowance</strong></p><p>Allow the dreamDEX MarginBank <code>{approval.spender}</code> to use up to {formatUnits(approval.amount, market.quoteDecimals)} {market.quoteSymbol} from your wallet. This is a limited allowance, including a 10% margin buffer. Unused allowance remains until spent or revoked. Token: <code>{approval.token}</code>. Your wallet will ask you to confirm a separate testnet transaction.</p><button type="button" onClick={approveCollateral} disabled={busy}>{busy ? "Waiting for wallet…" : "Approve testnet USDso in wallet"}</button></div> : null}
     {approvalStatus ? <p className="trade-result" role="status">{approvalStatus}</p> : null}
     {result ? <p className="trade-result">{result.status}. Somnia Hideki ({DREAMDEX_CHAIN.id}) · {account ? shortenAddress(account) : "Wallet"} · {market.symbol} · transaction <code>{result.hash}</code>{result.block > 0n ? ` · block ${result.block}` : ""}{result.timestamp ? ` · ${new Date(result.timestamp * 1000).toLocaleString()}` : ""}. Use the wallet lookup above to inspect indexed activity.</p> : null}

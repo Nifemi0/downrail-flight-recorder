@@ -13,3 +13,9 @@ evidence/private/
 
 # Local unfinished demo draft
 /demo-video/
+
+# Local chain event archives
+/local-archives/
+
+# Experimental EVM tooling scratch files
+/contracts/guard-lab/.scratch-vm/

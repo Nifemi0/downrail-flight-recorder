@@ -1,10 +1,11 @@
 import { formatUnits, getAddress, isAddress } from "viem";
 
+import { retryTransient } from "./retry";
 import { createDreamDexClient, DREAMDEX_CHAIN } from "./config";
 import { getMarketSnapshot, type SupportedPerpMarket } from "./markets";
 
 type SourceState = "indexed" | "unavailable";
-type SourceName = "positions" | "openOrders" | "orderHistory" | "fills" | "positionChanges" | "funding" | "marginEvents" | "liquidations";
+type SourceName = "positions" | "openOrders" | "orderHistory" | "fills" | "positionChanges" | "funding" | "fees" | "marginEvents" | "liquidations";
 const PAGE_SIZE = 50;
 
 type PageCursor = { offset: number; fillsCursor: string | null };
@@ -70,6 +71,8 @@ export type AccountFunding = {
   transactionHash: string;
 };
 
+export type AccountFee = { id: string; market: string; kind: string; amount: string; isRebate: boolean; timestamp: string; transactionHash: string };
+
 export type AccountOrder = {
   id: string;
   market: string;
@@ -111,6 +114,7 @@ export type AccountRecorderSnapshot = {
   fills: AccountFill[];
   positionChanges: AccountPositionChange[];
   funding: AccountFunding[];
+  fees: AccountFee[];
   marginEvents: AccountMarginEvent[];
   liquidations: AccountLiquidation[];
   page: number;
@@ -173,17 +177,18 @@ export async function getAccountRecorderSnapshot(
     marketSnapshot.supported.map((market) => [market.poolAddress.toLowerCase(), market]),
   );
 
-  const [positionsRead, openOrdersRead, orderHistoryRead, fillsRead, changesRead, fundingRead, marginRead, liquidationRead] = await Promise.allSettled([
-    client.listPerpPositions(account, { includeFlat: true, limit: PAGE_SIZE + 1, offset: cursor.offset }),
-    client.getPerpPortfolio(account, { ordersLimit: 1000, tradesLimit: 0 }),
-    client.listPerpOrderHistory(account, { limit: PAGE_SIZE + 1, offset: cursor.offset }),
+  const [positionsRead, openOrdersRead, orderHistoryRead, fillsRead, changesRead, fundingRead, feesRead, marginRead, liquidationRead] = await Promise.allSettled([
+    retryTransient(() => client.listPerpPositions(account, { includeFlat: true, limit: PAGE_SIZE + 1, offset: cursor.offset })),
+    retryTransient(() => client.getPerpPortfolio(account, { ordersLimit: 1000, tradesLimit: 0 })),
+    retryTransient(() => client.listPerpOrderHistory(account, { limit: PAGE_SIZE + 1, offset: cursor.offset })),
     cursor.offset > 0 && cursor.fillsCursor === null
       ? Promise.resolve({ fills: [], nextCursor: null, datasetGeneration: "" })
-      : client.getUserFillsPage(account, { marketType: "PERP", limit: PAGE_SIZE, ...(cursor.fillsCursor ? { cursor: cursor.fillsCursor } : {}) }),
-    client.listPerpPositionChanges({ account, order: "desc", limit: PAGE_SIZE + 1, offset: cursor.offset }),
-    client.getFundingPayments(account, { limit: PAGE_SIZE + 1, offset: cursor.offset }),
-    client.getMarginEvents(account, { limit: PAGE_SIZE + 1, offset: cursor.offset }),
-    client.listLiquidations({ account, limit: PAGE_SIZE + 1, offset: cursor.offset }),
+      : retryTransient(() => client.getUserFillsPage(account, { marketType: "PERP", limit: PAGE_SIZE, ...(cursor.fillsCursor ? { cursor: cursor.fillsCursor } : {}) })),
+    retryTransient(() => client.listPerpPositionChanges({ account, order: "desc", limit: PAGE_SIZE + 1, offset: cursor.offset })),
+    retryTransient(() => client.getFundingPayments(account, { limit: PAGE_SIZE + 1, offset: cursor.offset })),
+    retryTransient(() => client.listPerpFees({ account, limit: PAGE_SIZE + 1, offset: cursor.offset })),
+    retryTransient(() => client.getMarginEvents(account, { limit: PAGE_SIZE + 1, offset: cursor.offset })),
+    retryTransient(() => client.listLiquidations({ account, limit: PAGE_SIZE + 1, offset: cursor.offset })),
   ]);
 
   const positions =
@@ -295,6 +300,16 @@ export async function getAccountRecorderSnapshot(
         })
       : [];
 
+  const fees = feesRead.status === "fulfilled" ? feesRead.value.slice(0, PAGE_SIZE).flatMap<AccountFee>((fee) => {
+    const market = fee.pool ? marketForPool(fee.pool, marketsByPool) : null;
+    if (fee.pool && !market) return [];
+    if (fee.kind !== "Fee" && fee.kind !== "Rebate") return [];
+    // Unknown-pool rows cannot be attributed to an individual position.
+    const decimals = market?.quoteDecimals;
+    if (decimals === undefined) return [];
+    return [{ id: fee.id, market: market!.symbol, kind: fee.kind, amount: units(fee.amount, decimals), isRebate: fee.isRebate, timestamp: fee.timestamp, transactionHash: fee.txHash }];
+  }) : [];
+
   const marginEvents = marginRead.status === "fulfilled"
     ? marginRead.value.slice(0, PAGE_SIZE).flatMap<AccountMarginEvent>((event) => {
         const market = event.pool ? marketForPool(event.pool, marketsByPool) : null;
@@ -319,10 +334,11 @@ export async function getAccountRecorderSnapshot(
     fills: fillsRead.status === "fulfilled" && fillsRead.value.nextCursor !== null,
     positionChanges: changesRead.status === "fulfilled" && changesRead.value.length > PAGE_SIZE,
     funding: fundingRead.status === "fulfilled" && fundingRead.value.length > PAGE_SIZE,
+    fees: feesRead.status === "fulfilled" && feesRead.value.length > PAGE_SIZE,
     marginEvents: marginRead.status === "fulfilled" && marginRead.value.length > PAGE_SIZE,
     liquidations: liquidationRead.status === "fulfilled" && liquidationRead.value.length > PAGE_SIZE,
   };
-  const anySourceFailed = [positionsRead, openOrdersRead, orderHistoryRead, fillsRead, changesRead, fundingRead, marginRead, liquidationRead].some((read) => read.status === "rejected");
+  const anySourceFailed = [positionsRead, openOrdersRead, orderHistoryRead, fillsRead, changesRead, fundingRead, feesRead, marginRead, liquidationRead].some((read) => read.status === "rejected");
   // Do not advance the shared offsets past a failed source: retry this page instead.
   const nextCursor = !anySourceFailed && Object.values(hasMore).some(Boolean)
     ? encodeCursor({ offset: cursor.offset + PAGE_SIZE, fillsCursor: fillsRead.status === "fulfilled" ? fillsRead.value.nextCursor : null })
@@ -344,6 +360,7 @@ export async function getAccountRecorderSnapshot(
     fills,
     positionChanges,
     funding,
+    fees,
     marginEvents,
     liquidations,
     page: cursor.offset / PAGE_SIZE + 1,
@@ -355,6 +372,7 @@ export async function getAccountRecorderSnapshot(
       fills: status("fills", fillsRead, fills.length),
       positionChanges: status("positionChanges", changesRead, positionChanges.length),
       funding: status("funding", fundingRead, funding.length),
+      fees: feesRead.status === "fulfilled" ? { ...status("fees", feesRead, fees.length), detail: `${fees.length} supported fee/rebate rows; account-wide or other fee kinds are not attributed.${hasMore.fees ? " Older rows available." : ""}` } : status("fees", feesRead, fees.length),
       marginEvents: status("marginEvents", marginRead, marginEvents.length),
       liquidations: status("liquidations", liquidationRead, liquidations.length),
     },

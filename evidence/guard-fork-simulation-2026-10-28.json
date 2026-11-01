@@ -1,0 +1,13 @@
+{
+  "kind": "local-in-memory-historical-state-simulation",
+  "date": "2026-10-28",
+  "chainId": 50383,
+  "block": "34494972",
+  "market": "ETH-PERP",
+  "pool": "0xd6cb1dd58580b84d76068ac21594219ce03aeddf",
+  "account": "0x249e79De269e54a901A3d2Ce660496563103b470",
+  "positionBeforeEth": "0.004",
+  "tightLimit": { "result": "reverted", "positionAfterEth": "0.004", "revertSelectorChecked": true, "revertError": "LimitExceeded", "ownerTokenAndBankCollateralUnchanged": true },
+  "widerLimit": { "result": "accepted", "positionAfterEth": "0.008", "logs": 8 },
+  "limitations": "Two local EVM runs of one scenario using unauthenticated historical RPC state. No transaction, deployment or approval was submitted to the chain. Gas, linked-payer effects, full cost coverage, future exposure and production safety are not established by these runs."
+}

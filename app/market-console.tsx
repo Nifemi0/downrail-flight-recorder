@@ -6,13 +6,20 @@ import { formatUnits, type Hex } from "viem";
 import type { AccountRecorderSnapshot } from "@/lib/dreamdex/account";
 import { buildReceiptEvents, formatEventTime, type ReceiptEvent } from "@/lib/dreamdex/receipt";
 import { buildPositionReceipts, type PositionReceipt } from "@/lib/dreamdex/position-receipt";
+import { compareArchiveChanges, parseLocalArchive, summarizeArchiveReceipt, type ImportedArchive } from "@/lib/dreamdex/archive-import";
+import { comparePositionChange } from "@/lib/dreamdex/chain-comparison";
+import { reconcilePosition } from "@/lib/dreamdex/reconciliation";
 import type { MarketSnapshot } from "@/lib/dreamdex/markets";
-import { formatCheckedAt, shortenAddress } from "@/lib/format";
+import { displayMoney, formatCheckedAt, shortenAddress } from "@/lib/format";
 import { TradeReview } from "./trade-review";
+import { ArchiveViewer } from "./archive-viewer";
 
 type Props = {
   initialSnapshot: MarketSnapshot;
 };
+
+type DirectEvents = { source: string; account: string; market: string; fromBlock: string; toBlock: string; rows: { type: string; blockNumber: string; logIndex: number; transactionHash: string; size: string | null; price: string | null; realizedPricePnl: string | null; amount: string | null }[]; note: string };
+type GasResult = { account: string; receiptId: string; hashKey: string; totalSTT: string; paid: number; other: number; unavailable: number; checked: number };
 
 type PositionAnalytics = { account: string; market: string; chainId: number; block: string; checkedAt: string; size: string; priceable: boolean; markPrice?: string; entryPrice?: string; unrealizedPricePnl?: string; accruedFundingOwed?: string; equityContribution?: string; quote?: string };
 
@@ -38,14 +45,6 @@ function compactUnits(value: string | null, decimals: number) {
   return trimmed ? `${whole}.${trimmed}` : whole;
 }
 
-function displayMoney(value: string) {
-  const [whole, fraction = ""] = value.split(".");
-  const firstNonzero = fraction.search(/[1-9]/);
-  const places = /^[+-]?0$/.test(whole) && firstNonzero >= 2 ? firstNonzero + 3 : 2;
-  const shown = fraction.slice(0, places).padEnd(2, "0");
-  return `${/[1-9]/.test(fraction.slice(places)) ? "≈ " : ""}${whole}.${shown}`;
-}
-
 export function MarketConsole({ initialSnapshot }: Props) {
   const [snapshot, setSnapshot] = useState(initialSnapshot);
   const [selectedSymbol, setSelectedSymbol] = useState("ETH-PERP");
@@ -61,10 +60,18 @@ export function MarketConsole({ initialSnapshot }: Props) {
   const [proofError, setProofError] = useState<string | null>(null);
   const [isCheckingProof, setIsCheckingProof] = useState(false);
   const [proofEventId, setProofEventId] = useState<string | null>(null);
+  const [localArchive, setLocalArchive] = useState<ImportedArchive | null>(null);
+  const [archiveError, setArchiveError] = useState<string | null>(null);
+  const [directEvents, setDirectEvents] = useState<DirectEvents | null>(null);
+  const [directError, setDirectError] = useState<string | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
   const [analytics, setAnalytics] = useState<PositionAnalytics | null>(null);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
   const [isCheckingAnalytics, setIsCheckingAnalytics] = useState(false);
   const [selectedReceiptId, setSelectedReceiptId] = useState<string | null>(null);
+  const [gasResult, setGasResult] = useState<GasResult | null>(null);
+  const [gasError, setGasError] = useState<string | null>(null);
+  const [checkingGas, setCheckingGas] = useState(false);
 
   const selected = useMemo(
     () =>
@@ -79,11 +86,30 @@ export function MarketConsole({ initialSnapshot }: Props) {
   const receiptEvents = useMemo(() => accountSnapshot ? buildReceiptEvents(accountSnapshot) : [], [accountSnapshot]);
   const positionReceipts = useMemo(() => accountSnapshot ? buildPositionReceipts(accountSnapshot).filter((receipt) => receipt.market === selected.symbol) : [], [accountSnapshot, selected.symbol]);
   const selectedReceipt = positionReceipts.find((receipt) => receipt.id === selectedReceiptId) ?? positionReceipts[0];
+  const reconciliation = useMemo(() => accountSnapshot && selectedReceipt ? reconcilePosition(accountSnapshot, positionReceipts, selectedReceipt) : null, [accountSnapshot, positionReceipts, selectedReceipt]);
   const selectedReceiptEvents = useMemo(() => {
     if (!selectedReceipt) return [];
     const ids = new Set([...selectedReceipt.changes.map((row) => `change-${row.id}`), ...selectedReceipt.fills.map((row) => `fill-${row.id}`), ...selectedReceipt.orders.map((row) => `order-${row.id}`)]);
+    if (reconciliation) { for (const fee of reconciliation.fees) ids.add(`fee-${fee.id}`); for (const payment of reconciliation.funding) ids.add(`funding-${payment.id}`); for (const event of reconciliation.liquidationEvents) ids.add(`liquidation-${event.id}`); }
     return receiptEvents.filter((event) => ids.has(event.id));
-  }, [receiptEvents, selectedReceipt]);
+  }, [receiptEvents, selectedReceipt, reconciliation]);
+  const receiptHashes = useMemo(() => [...new Set(selectedReceiptEvents.map((event) => event.transactionHash.toLowerCase()).filter((hash) => /^0x[0-9a-f]{64}$/.test(hash)))].sort(), [selectedReceiptEvents]);
+
+  async function checkGas() {
+    if (!accountSnapshot || !selectedReceipt || checkingGas) return;
+    const hashes = receiptHashes;
+    if (!hashes.length) { setGasError("No transaction hashes are available for this position."); return; }
+    if (hashes.length > 20) { setGasError(`This position has ${hashes.length} transactions; gas checking currently supports up to 20.`); return; }
+    const owner = accountSnapshot.account, receiptId = selectedReceipt.id;
+    setCheckingGas(true); setGasResult(null); setGasError(null);
+    try {
+      const response = await fetch(`/api/accounts/${encodeURIComponent(owner)}/gas`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ hashes }) });
+      const body = await response.json() as Omit<GasResult, "receiptId" | "checked" | "hashKey"> | { error: string };
+      if (!response.ok || "error" in body) throw new Error("error" in body ? body.error : "Gas lookup failed.");
+      setGasResult({ ...body, receiptId, hashKey: hashes.join(","), checked: hashes.length });
+    } catch (cause) { setGasError(cause instanceof Error ? cause.message : "Gas lookup failed."); }
+    finally { setCheckingGas(false); }
+  }
 
   async function refreshSnapshot() {
     setIsRefreshing(true);
@@ -113,8 +139,13 @@ export function MarketConsole({ initialSnapshot }: Props) {
     setProofError(null);
     setProofEventId(null);
     setSelectedReceiptId(null);
+    setGasResult(null); setGasError(null);
     setAnalytics(null);
     setAnalyticsError(null);
+    setDirectEvents(null);
+    setDirectError(null);
+    setLocalArchive(null);
+    setArchiveError(null);
 
     try {
       const response = await fetch(`/api/accounts/${encodeURIComponent(address.trim())}`, {
@@ -151,11 +182,36 @@ export function MarketConsole({ initialSnapshot }: Props) {
         fills: [...previous.fills, ...body.fills.filter((row) => !previous.fills.some((old) => old.id === row.id))],
         positionChanges: [...previous.positionChanges, ...body.positionChanges.filter((row) => !previous.positionChanges.some((old) => old.id === row.id))],
         funding: [...previous.funding, ...body.funding.filter((row) => !previous.funding.some((old) => old.id === row.id))],
+        fees: [...previous.fees, ...body.fees.filter((row) => !previous.fees.some((old) => old.id === row.id))],
         marginEvents: [...previous.marginEvents, ...body.marginEvents.filter((row) => !previous.marginEvents.some((old) => old.id === row.id))],
         liquidations: [...previous.liquidations, ...body.liquidations.filter((row) => !previous.liquidations.some((old) => old.id === row.id))],
       } : body);
     } catch (cause) { setAccountError(cause instanceof Error ? cause.message : "Older records could not be read."); }
     finally { setIsLoadingOlder(false); }
+  }
+
+  async function importArchive(file: File | undefined) {
+    setLocalArchive(null); setArchiveError(null);
+    if (!file || !accountSnapshot) return;
+    try {
+      if (file.size > 5 * 1024 * 1024) throw new Error("Archive exceeds the 5 MB local import limit.");
+      const archive = parseLocalArchive(await file.text(), {account:accountSnapshot.account,market:selected.symbol,pool:selected.poolAddress});
+      setLocalArchive(archive);
+    } catch (error) { setArchiveError(error instanceof Error ? error.message : "Could not read this archive."); }
+  }
+
+  async function checkOpeningBlock() {
+    if (!accountSnapshot || !selectedReceipt || isScanning) return;
+    const block = selectedReceipt.changes[0].blockNumber;
+    setIsScanning(true); setDirectEvents(null); setDirectError(null);
+    try {
+      const url = `/api/accounts/${encodeURIComponent(accountSnapshot.account)}/chain-events?market=${encodeURIComponent(selectedReceipt.market)}&fromBlock=${block}&toBlock=${block}`;
+      const response = await fetch(url, { cache: "no-store" });
+      const body = (await response.json()) as DirectEvents | { error: string };
+      if (!response.ok || "error" in body) throw new Error("error" in body ? body.error : "Chain scan failed.");
+      setDirectEvents(body);
+    } catch (cause) { setDirectError(cause instanceof Error ? cause.message : "Chain scan failed."); }
+    finally { setIsScanning(false); }
   }
 
   async function checkPositionAnalytics() {
@@ -195,15 +251,15 @@ export function MarketConsole({ initialSnapshot }: Props) {
   function exportReceipt(receipt: PositionReceipt) {
     if (!accountSnapshot) return;
     const content = JSON.stringify({
-      product: "Downrail Flight Recorder", network: "Somnia Hideki testnet", chainId: accountSnapshot.chainId,
+      product: "Filltrail", network: "Somnia Hideki testnet", chainId: accountSnapshot.chainId,
       account: accountSnapshot.account, checkedAt: accountSnapshot.checkedAt, source: "dreamDEX indexer",
-      coverage: "Observed records only; history may be incomplete. Fills are matched by transaction and market; individual order attribution is not independently verified. Funding, fees, and complete net PnL are not calculated.",
-      sourceStatus: accountSnapshot.sourceStatus, morePagesAvailable: accountSnapshot.nextCursor !== null, receipt,
+      coverage: "Observed records only; history may be incomplete. Fills, fees, and funding are matched by transaction and market where an episode is unique, not independently attributed. Unmatched activity and gas are excluded; subtotal is not complete net PnL.",
+      sourceStatus: accountSnapshot.sourceStatus, morePagesAvailable: accountSnapshot.nextCursor !== null, receipt, reconciliation: reconcilePosition(accountSnapshot, positionReceipts, receipt),
     }, null, 2);
     const url = URL.createObjectURL(new Blob([content], { type: "application/json" }));
     const link = document.createElement("a");
     link.href = url;
-    link.download = `downrail-${receipt.market.toLowerCase()}-receipt.json`;
+    link.download = `filltrail-${receipt.market.toLowerCase()}-receipt.json`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -211,11 +267,11 @@ export function MarketConsole({ initialSnapshot }: Props) {
   return (
     <main>
       <header className="site-header">
-        <a className="brand" href="#top" aria-label="Downrail Flight Recorder home">
+        <a className="brand" href="#top" aria-label="Filltrail home">
           <span className="brand-mark" aria-hidden="true">
             <span />
           </span>
-          <span>DOWNRAIL</span>
+          <span>FILLTRAIL</span>
         </a>
         <nav aria-label="Primary navigation">
           <a href="#explain">What it solves</a>
@@ -291,7 +347,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
 
       <section className="explain-section" id="explain">
         <div className="explain-heading">
-          <p className="eyebrow">The problem Downrail solves</p>
+          <p className="eyebrow">The problem Filltrail solves</p>
           <h2>One wallet.<br />Every available source, labeled.</h2>
           <p>A perp position is spread across orders, partial fills, funding payments, margin movements, and position updates. This view brings the available indexed records together without manufacturing a total PnL.</p>
         </div>
@@ -313,8 +369,8 @@ export function MarketConsole({ initialSnapshot }: Props) {
           </div>
         </div>
 
-        <div className="how-flow" aria-label="How Downrail works">
-          <article><span>1</span><div><h3>Enter a public wallet</h3><p>No deposit and no private key. Downrail only reads supported testnet activity.</p></div></article>
+        <div className="how-flow" aria-label="How Filltrail works">
+          <article><span>1</span><div><h3>Enter a public wallet</h3><p>No deposit or private key is needed to read supported testnet activity.</p></div></article>
           <article><span>2</span><div><h3>We rebuild the sequence</h3><p>Orders, fills, funding, and position changes are placed in chronological order.</p></div></article>
           <article><span>3</span><div><h3>You get a readable record</h3><p>See what changed the position and keep the source behind every available claim.</p></div></article>
         </div>
@@ -411,6 +467,8 @@ export function MarketConsole({ initialSnapshot }: Props) {
               </div>
             </div>
 
+            <ArchiveViewer />
+
             <form className="account-lookup" onSubmit={inspectAccount}>
               <div>
                 <p className="panel-label">Already traded?</p>
@@ -455,6 +513,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
                   <div><strong>{accountSnapshot.positionChanges.length}</strong><span>Changes loaded</span></div>
                   <div><strong>{accountSnapshot.marginEvents.length}</strong><span>Margin rows loaded</span></div>
                   <div><strong>{accountSnapshot.funding.length}</strong><span>Funding loaded</span></div>
+                  <div><strong>{accountSnapshot.fees.length}</strong><span>Fee records loaded</span></div>
                   <div><strong>{accountSnapshot.liquidations.length}</strong><span>Liquidation stages loaded</span></div>
                 </div>
                 <div className="receipt-sources" aria-label="Indexer source status">
@@ -469,7 +528,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
                   </div>
                   {selectedReceipt ? <>
                     <label className="receipt-select">Observed position
-                      <select value={selectedReceipt.id} onChange={(event) => setSelectedReceiptId(event.target.value)}>
+                      <select value={selectedReceipt.id} onChange={(event) => { setSelectedReceiptId(event.target.value); setGasError(null); }}>
                         {positionReceipts.map((receipt) => <option key={receipt.id} value={receipt.id}>{formatEventTime(receipt.changes[0].timestamp)} · {receipt.startObserved ? "opening observed" : "opening not loaded"} · {receipt.end}</option>)}
                       </select>
                     </label>
@@ -479,15 +538,45 @@ export function MarketConsole({ initialSnapshot }: Props) {
                       <div><span>Matched fills</span><strong>{selectedReceipt.fills.length}</strong></div>
                       <div><span>Observed price PnL</span><strong title={`Exact indexed sum: ${selectedReceipt.observedPricePnl} USDso`}>{displayMoney(selectedReceipt.observedPricePnl)} USDso</strong></div>
                     </div>
-                    <p className="receipt-explanation">Observed realized price PnL is the sum of loaded position-change values. It does not include the current unrealized PnL of an open position or the final net result. The exact sum is in the evidence export. Fills are associated by matching market and transaction; orders are matched to those fills by order ID. Funding, fees, and unmatched activity are not attributed to this position.</p>
+                    <p className="receipt-explanation">Observed realized price PnL is the sum of loaded position-change values. It does not include the current unrealized PnL of an open position or the final net result. The exact sum is in the evidence export. Fills are associated by matching market and transaction; orders are matched to those fills by order ID. Only uniquely transaction-matched funding and fee records are included below; unmatched activity is not attributed.</p>
                     <p className="receipt-explanation">{Object.values(accountSnapshot.sourceStatus).some((source) => source.state === "unavailable") ? "Some sources are unavailable; inspect this wallet again to retry. " : accountSnapshot.nextCursor ? "Older records are available; load them to look for missing history. " : "No further page was returned for this lookup. "}The indexer can still have gaps, and a flip or missing opening may make this receipt partial.</p>
+                    {reconciliation ? <div className="receipt-reconciliation">
+                      <h5>Observed costs and credits</h5>
+                      <div className="receipt-summary-grid">
+                        <div><span>Price PnL</span><strong>{selectedReceipt.observedPricePnl} USDso</strong></div>
+                        <div><span>Matched fees and rebates</span><strong>{accountSnapshot.sourceStatus.fees.state === "unavailable" ? "Unavailable" : `${reconciliation.feeImpact} USDso`}</strong></div>
+                        <div><span>Matched funding impact</span><strong>{accountSnapshot.sourceStatus.funding.state === "unavailable" ? "Unavailable" : `${reconciliation.fundingImpact} USDso`}</strong></div>
+                        <div><span>Observed subtotal</span><strong>{accountSnapshot.sourceStatus.fees.state === "unavailable" || accountSnapshot.sourceStatus.funding.state === "unavailable" ? "Unavailable" : `${reconciliation.observedSubtotal} USDso`}</strong></div>
+                      </div>
+                      <p className="receipt-explanation">Only loaded records sharing a uniquely associated market and transaction are included. {reconciliation.fees.length} fee records and {reconciliation.funding.length} funding records matched. {reconciliation.unmatchedFees.length} fee and {reconciliation.unmatchedFunding.length} funding records for this market were not matched to this position. Missing pages, account-wide rows, fees, funding, gas and ambiguous events can change the result. This subtotal is not complete net PnL.</p>
+                      {reconciliation.liquidationEvents.length ? <p className="receipt-explanation"><strong>Liquidation-related activity was indexed in a transaction associated with this position.</strong> Liquidation-specific costs are not included in this subtotal. Inspect the indexed records and chain evidence; a shared transaction alone does not establish every cost.</p> : null}
+                      {accountSnapshot.sourceStatus.fees.state === "unavailable" || accountSnapshot.sourceStatus.funding.state === "unavailable" ? <p className="account-error">A cost source is unavailable; the subtotal omits records that could not be read.</p> : null}
+                    </div> : null}
+                    <details className="receipt-evidence"><summary>Check transaction gas</summary>
+                      <p className="receipt-explanation">Check gas paid by this wallet for the observed transaction hashes. A transaction can contain other actions, so this is not necessarily the cost of this position.</p>
+                      <button type="button" className="receipt-export" onClick={() => void checkGas()} disabled={checkingGas}>{checkingGas ? "Checking gas…" : "Check gas in STT"}</button>
+                      {gasError ? <p className="account-error" role="status">{gasError}</p> : null}
+                      {gasResult && gasResult.account.toLowerCase() === accountSnapshot.account.toLowerCase() && gasResult.receiptId === selectedReceipt.id && gasResult.hashKey === receiptHashes.join(",") ? <p className="receipt-explanation" role="status"><strong>{gasResult.totalSTT} STT</strong> paid by this wallet across {gasResult.paid} of {gasResult.checked} observed transactions. {gasResult.other} had a different sender; {gasResult.unavailable} receipts were unavailable. Unobserved transactions are excluded; this is not converted to USDso or included in net PnL.</p> : null}
+                    </details>
+                    <div className="receipt-reconciliation">
+                      <p className="receipt-explanation">Compare the first loaded position-change block against MarginBank events read directly from the chain. This checks one block only.</p>
+                      <button type="button" className="receipt-export" onClick={() => void checkOpeningBlock()} disabled={isScanning}>{isScanning ? "Checking chain…" : "Check first change on chain"}</button>
+                      {directError ? <p className="account-error" role="status">{directError}</p> : null}
+                      {directEvents && directEvents.account.toLowerCase() === accountSnapshot.account.toLowerCase() && directEvents.market === selectedReceipt.market && directEvents.fromBlock === selectedReceipt.changes[0].blockNumber ? <div role="status"><p className="receipt-explanation"><strong>First indexed change: {comparePositionChange(selectedReceipt.changes[0], directEvents.rows) === "matches" ? "size and realized price PnL match the chain event" : comparePositionChange(selectedReceipt.changes[0], directEvents.rows) === "different" ? "the chain event differs; inspect the records" : "matching chain event not found"}.</strong> {directEvents.source} · block {directEvents.fromBlock} · {directEvents.rows.length} matching events. {directEvents.note}</p>{directEvents.rows.map((row) => <p className="receipt-explanation" key={`${row.transactionHash}-${row.logIndex}`}><strong>{row.type}</strong> · log {row.logIndex} · {row.size !== null ? `position size ${row.size}; price ${row.price}; realized price PnL ${row.realizedPricePnl} USDso` : `amount ${row.amount} USDso`} · <code>{row.transactionHash}</code></p>)}</div> : null}
+                    </div>
+                    <details className="receipt-evidence"><summary>Compare a local event archive</summary>
+                      <p className="receipt-explanation">Import an archive created by the local backfill command. The file stays in this browser; it can be edited and is not independently authenticated.</p>
+                      <label className="receipt-select">Archive JSON<input type="file" accept="application/json,.json" onChange={(event) => void importArchive(event.target.files?.[0])} /></label>
+                      {archiveError ? <p className="account-error" role="status">{archiveError}</p> : null}
+                      {localArchive && localArchive.account.toLowerCase() === accountSnapshot.account.toLowerCase() && localArchive.market === selected.symbol && localArchive.pool.toLowerCase() === selected.poolAddress.toLowerCase() ? <div role="status"><p className="receipt-explanation">Local file · blocks {localArchive.startBlock}–{localArchive.checkpoint} · {localArchive.rows.length} stored events. Coverage is limited to its stated range and event types.</p>{compareArchiveChanges(selectedReceipt.changes,localArchive).map(({change,status}) => <p className="receipt-explanation" key={change.id}>Position change at block {change.blockNumber}, log {change.logIndex}: <strong>{status}</strong>.</p>)}{(() => { const summary = summarizeArchiveReceipt(selectedReceipt,positionReceipts,localArchive); return summary ? <p className="receipt-explanation">Local-file subtotal for this covered closed position: <strong>{summary.subtotal} USDso</strong>, including {summary.costCount} captured funding, fee, or rebate events with a combined impact of {summary.costImpact} USDso. This editable file is not authenticated and excludes gas and other event kinds; it is not complete net PnL.</p> : <p className="receipt-explanation">A local-file subtotal is unavailable because the opening, close, coverage, or position-change comparison is incomplete or ambiguous.</p>; })()}</div> : null}
+                    </details>
                     <details className="receipt-evidence"><summary>Show {selectedReceiptEvents.length} observed records and transaction hashes</summary>
                       {selectedReceiptEvents.map((event) => <div key={event.id}><span>{formatEventTime(event.timestamp)} · {event.kind} · {event.title}</span><a href={`#event-${encodeURIComponent(event.id)}`}>View event and check transaction</a><code>{event.transactionHash}</code></div>)}
                     </details>
                   </> : <p className="receipt-explanation">No position changes for {selected.symbol} are loaded yet. Try the other market or load older records.</p>}
                 </section>
                 <section className="position-receipt" aria-label="Current on-chain position snapshot">
-                  <div className="position-receipt-head"><div><p className="panel-label">Current on-chain snapshot · {selected.symbol}</p><h5>How is the open position doing now?</h5></div><button type="button" className="receipt-export" onClick={() => void checkPositionAnalytics()} disabled={isCheckingAnalytics}>{isCheckingAnalytics ? "Checking…" : "Check current position"}</button></div>
+                  <div className="position-receipt-head"><div><p className="panel-label">Current on-chain snapshot · {selected.symbol}</p><h5>What is the current position?</h5></div><button type="button" className="receipt-export" onClick={() => void checkPositionAnalytics()} disabled={isCheckingAnalytics}>{isCheckingAnalytics ? "Checking…" : "Check current position"}</button></div>
                   <p className="receipt-explanation">This reads the current position and mark from the chain at one block. It is separate from the historical receipt above.</p>
                   {analyticsError ? <p className="account-error" role="status">{analyticsError}</p> : null}
                   {analytics && analytics.market === selected.symbol && analytics.account.toLowerCase() === accountSnapshot.account.toLowerCase() ? <div role="status">
@@ -555,7 +644,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
           <div>
             <p className="eyebrow">What the recorder keeps</p>
           <h2>Every indexed event has a source.</h2>
-            <p className="section-intro">A position moves through multiple contracts and events. Downrail shows the available sequence and makes missing data visible.</p>
+            <p className="section-intro">A position moves through multiple contracts and events. Filltrail shows the available sequence and makes missing data visible.</p>
             <a className="text-action" href="#proof">See the live proof <span aria-hidden="true">→</span></a>
           </div>
           <div className="mechanic-stream">
@@ -600,7 +689,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
         <div className="footer-brand">
           <a className="brand brand-light" href="#top" aria-label="Back to top">
             <span className="brand-mark" aria-hidden="true"><span /></span>
-            <span>DOWNRAIL</span>
+            <span>FILLTRAIL</span>
           </a>
           <p>Readable indexed activity for dreamDEX Perps.</p>
         </div>
@@ -610,7 +699,7 @@ export function MarketConsole({ initialSnapshot }: Props) {
         </div>
         <div className="footer-status">
           <span><i className="status-dot" />Somnia testnet</span>
-          <small>Local build · No custody</small>
+          <small>Testnet · No custody</small>
         </div>
       </footer>
     </main>

@@ -1,0 +1,21 @@
+{
+  "description": "Read-only follow-up on the later owner testnet ETH-PERP position. This is separate from the October 26 open-and-close demonstration.",
+  "checkedDate": "2026-10-31",
+  "chainId": 50383,
+  "account": "0x249e79De269e54a901A3d2Ce660496563103b470",
+  "pool": "0xD6Cb1DD58580B84D76068aC21594219ce03aeddf",
+  "transactionHash": "0xe3d5792107d755e652f526f188caa8048fc6e619abf816bdcbae15a66baa842f",
+  "blockNumber": "36533814",
+  "blockTimestampUTC": "2026-10-29T20:43:14Z",
+  "receiptStatus": "success",
+  "directRpcEvents": [
+    { "event": "FundingSettled", "logIndex": 24, "paymentPaperUSDso": "0.006666652116834025", "meaning": "positive payment owed" },
+    { "event": "PositionUpdated", "logIndex": 26, "positionSizeETH": "0", "realizedPricePnlPaperUSDso": "-0.23756" },
+    { "event": "PositionLiquidated", "logIndex": 31, "sizeDeltaETH": "-0.004", "emitter": "0xA66d3C24Ad4a389d863846905D8173e1017e9F4D" },
+    { "event": "LiquidationFeeCharged", "logIndex": 33, "amountPaperUSDso": "0.0901368", "emitter": "0xA66d3C24Ad4a389d863846905D8173e1017e9F4D" },
+    { "event": "LiquidationKeeperRewardPaid", "logIndex": 34, "amountPaperUSDso": "0.05", "emitter": "0xA66d3C24Ad4a389d863846905D8173e1017e9F4D" },
+    { "event": "AccountLiquidated", "logIndex": 35, "emitter": "0xA66d3C24Ad4a389d863846905D8173e1017e9F4D" }
+  ],
+  "indexerObservation": "The indexer reports PositionLiquidated, KeeperReward and AccountLiquidated stages in this transaction. The listed liquidation events were decoded from the transaction receipt using the SDK ABI; the emitter matches the MarginBank system configuration at this block.",
+  "limitations": "This is not complete net PnL. The relationship between the liquidation fee, keeper reward and other costs has not been reconciled; they must not simply be summed. Gas and missing or ambiguous history require separate verification. RPC data is not proof-authenticated. The account and market pool are public testnet addresses."
+}

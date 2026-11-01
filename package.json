@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "spike:markets": "tsx scripts/read-markets.ts"
+    "spike:markets": "tsx scripts/read-markets.ts",
+    "archive:events": "tsx scripts/archive-events.ts",
+    "archive:follow": "tsx scripts/follow-events.ts"
   },
   "dependencies": {
     "@somnia-chain/markets-sdk": "0.32.1",

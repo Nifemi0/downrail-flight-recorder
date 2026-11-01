@@ -1,5 +1,11 @@
 # Decision Log
 
+## October 31, 2026 — Product name and deadline update
+
+**Decision:** Rename the current product Filltrail, retaining the existing repository and historical evidence under their original names. Keep the current visual direction and product scope.
+
+**Deadline:** DoraHacks displayed an extension to November 15, 2026, 14:30 UTC on October 31; its description still showed November 1. Recheck the official page before submission. The earlier deadline decision remains below as historical context.
+
 ## October 23, 2026 — Product direction
 
 **Decision:** Build Downrail Flight Recorder for the MVP track.

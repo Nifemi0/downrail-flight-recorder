@@ -1,24 +1,26 @@
 # X posts — drafts for review
 
-The bounty requires two or three posts tagging @DreamDEXSomnia; these are drafts, not posted links. Verify any future close and final links before publishing.
+The bounty requires two or three posts tagging @DreamDEXSomnia. Published links are listed below; the text in the sections is retained as drafts.
 
 ## Post 1 — the problem
 
-Perp trades leave a trail of orders, fills, position changes and funding. Downrail Flight Recorder brings dreamDEX testnet records into a position-focused view so a trader can inspect what happened without starting with raw contract logs.
+Perp trades leave a trail: orders, fills, position changes and funding. Filltrail brings the available dreamDEX testnet records together so you can see what happened.
 
 Building for the @DreamDEXSomnia Perps Builder Bounty.
 
 ## Post 2 — what can be checked
 
-Flight Recorder groups observed position changes and links fills when the market and transaction match. You can inspect the transaction and export the records. If history is missing, the receipt says so; funding and complete net PnL are not yet attributed.
+Filltrail groups observed position changes and links matching fills. Check a transaction on-chain and export the evidence. Known gaps are flagged; complete net PnL isn’t claimed.
 
-Built on the @DreamDEXSomnia SDK and Somnia Hideki testnet. [Add the verified repository and demo links after they exist.]
+Built with @DreamDEXSomnia on testnet.
+
+[Repo link] [Demo link]
 
 ## Post 3 — live order evidence, after verification
 
-I opened and closed 0.004 ETH-PERP through Flight Recorder on testnet. Entry: 2308.49 paper USDso. Exit: 2306.86. The indexer reports -0.00652 USDso in realized price PnL; both fill prices match their chain logs. Funding and fees aren't included in that number. [Add the verified receipt or demo link.]
+I opened and closed 0.004 ETH-PERP with Filltrail on @DreamDEXSomnia testnet. Entry: 2308.49; exit: 2306.86 paper USDso. The recorded price PnL was -0.00652 USDso, excluding fees and funding.
 
-Testnet STT and paper USDso have no real-money value. @DreamDEXSomnia
+[Evidence link]
 
 ## Published links
 

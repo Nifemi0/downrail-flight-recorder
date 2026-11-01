@@ -2,11 +2,11 @@
 
 ## Product
 
-Downrail Flight Recorder
+Filltrail
 
 ## Product statement
 
-Downrail explains what happened to a real dreamDEX perp position and proves each part of the explanation with testnet evidence.
+Filltrail explains observed records for a real dreamDEX perp position and links available statements to testnet evidence. Some history and costs may be unavailable.
 
 ## Goals
 
@@ -46,10 +46,10 @@ Downrail explains what happened to a real dreamDEX perp position and proves each
 
 ## Core journey
 
-1. User opens Downrail and sees the testnet/network status.
+1. User opens Filltrail and sees the testnet/network status.
 2. User connects an eligible wallet or uses the documented owner-controlled demo flow.
 3. User selects ETH-PERP or BTC-PERP and enters a deliberately small order.
-4. Downrail validates market metadata and submits the signed testnet transaction.
+4. Filltrail validates market metadata and submits the wallet-signed testnet transaction.
 5. The recorder follows order acceptance, fills, position state, and later reduction or closure.
 6. The receipt explains the lifecycle and links to evidence.
 
@@ -110,5 +110,5 @@ The MVP passes when a new reviewer can follow documented setup, place or inspect
 | Indexer does not expose complete historical state | Weakens reconstruction | Record live lifecycle events and preserve a redacted evidence artifact |
 | Funding cannot be attributed precisely | Misleading receipt | Show funding only when source data is verifiable; otherwise mark unavailable |
 | Testnet liquidity prevents fills | Demo failure | Use small IOC/marketable limit with documented slippage bounds and retain a resting-order lifecycle fallback |
-| Deadline ambiguity | Submission risk | Treat Nov 1 23:59 UTC as hard deadline and target Oct 31 |
+| Deadline ambiguity | Submission risk | DoraHacks displayed a Nov 15, 14:30 UTC extension on Oct 31, while the description still said Nov 1; recheck before submitting |
 

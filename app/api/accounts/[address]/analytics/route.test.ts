@@ -6,7 +6,7 @@ import { GET } from "./route";
 const address = "0x0000000000000000000000000000000000000001";
 const request = (market: string) => new Request(`http://localhost/api/accounts/${address}/analytics?market=${market}`);
 const context = { params: Promise.resolve({ address }) };
-beforeEach(() => analytics.mockReset());
+beforeEach(() => { analytics.mockReset(); });
 describe("position analytics endpoint", () => {
   it("returns block-pinned values and preserves the funding-owed sign", async () => {
     analytics.mockResolvedValue({ priceable: true, asOfBlock: 55n, size: 1000000000000000000n, markPrice: 2000000000000000000000n, avgEntryPrice: 2100000000000000000000n, unrealizedPnl: -100000000000000000000n, accruedFunding: 1000000000000000000n, equityContribution: -101000000000000000000n });
@@ -19,6 +19,12 @@ describe("position analytics endpoint", () => {
     const body = await (await GET(request("ETH-PERP"), context)).json();
     expect(body).toMatchObject({ priceable: false, size: "1", block: "56" });
     expect(body.unrealizedPricePnl).toBeUndefined();
+  });
+  it("returns unavailable rather than fabricated values when the RPC fails", async () => {
+    analytics.mockRejectedValue(new Error("RPC down"));
+    const result=await GET(request("ETH-PERP"),context);
+    expect(result.status).toBe(502);
+    expect(await result.json()).toHaveProperty("error");
   });
   it("rejects unsupported markets and reports unavailable market data", async () => {
     expect((await GET(request("OTHER"), context)).status).toBe(400);
