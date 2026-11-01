@@ -22,6 +22,6 @@ Testnet STT and paper USDso have no real-money value. @DreamDEXSomnia
 
 ## Published links
 
-- Post 1: pending
-- Post 2: pending
+- Post 1: https://x.com/Love_Light_11/status/2116622676051804304
+- Post 2: https://x.com/Love_Light_11/status/2116856081179713648
 - Post 3: pending

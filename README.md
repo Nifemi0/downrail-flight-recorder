@@ -48,7 +48,10 @@ The next milestone is to reconcile the position's attributable records and make 
 
 ## X posts
 
-Two or three posts tagging @DreamDEXSomnia are required by the bounty. [Drafts](docs/submission/X-POSTS-DRAFT.md) are prepared locally; published links are pending.
+Two posts tagging @DreamDEXSomnia:
+
+- [Introducing Filltrail](https://x.com/Love_Light_11/status/2116622676051804304)
+- [See what happened after a trade](https://x.com/Love_Light_11/status/2116856081179713648)
 
 ## Scope boundary
 
